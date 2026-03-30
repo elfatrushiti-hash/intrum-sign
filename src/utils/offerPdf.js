@@ -22,6 +22,10 @@ export function exportOfferPDF(data) {
 
   // ✅ Seite 4
   drawDTPPage(pdf);
+  
+ // ✅ Seite 5
+  drawSigningPage(pdf, data);
+
 
 
 function drawDottedLine(pdf, x, y, width) {
@@ -250,55 +254,97 @@ function drawDTPPage(pdf) {
   drawDTPPage(pdf);
   pdf.addPage();
   
-  // ------------------------------------------
-  // ✅ PAGE 5 – SIGNING Tabellen (Neutral)
-  // ------------------------------------------
+ // ----------------------------------------------------------
+// ✅ Seite 5 – SIGNING (neutraler Aufbau)
+// ----------------------------------------------------------
+function drawSigningPage(pdf, data) {
+
+  const grayLight = [240, 240, 240];
+  const textColor = [0, 0, 0];
+
+  // ---------------------------------------
+  // ✅ Kapitelüberschrift
+  // ---------------------------------------
   pdf.setFont("helvetica", "bold");
-  pdf.setFontSize(16);
+  pdf.setFontSize(18);
+  pdf.setTextColor(...textColor);
   pdf.text("2. SIGNING", 20, 20);
 
-  // EES
+  // ---------------------------------------
+  // ✅ Einleitungstext (neutral)
+  // ---------------------------------------
+  pdf.setFont("helvetica", "normal");
+  pdf.setFontSize(11);
+  
+  const introText =
+    "Dieser Abschnitt beschreibt die verschiedenen elektronischen Signaturstufen " +
+    "(EES, FES, QES) und ergänzt diese um ein neutrales Preisbeispiel. " +
+    "Diese Texte kannst du frei durch deine eigenen Inhalte ersetzen.";
+
+  pdf.text(introText, 20, 32, { maxWidth: 170, lineHeightFactor: 1.4 });
+
+
+  // ---------------------------------------
+  // ✅ EES – Tabelle
+  // ---------------------------------------
   autoTable(pdf, {
-    startY: 30,
+    startY: 55,
     head: [["Beschreibung", "Preis (CHF)"]],
-    body: [["Einfache elektronische Signatur (EES)", data.ees || "0.80"]],
-    headStyles: { fillColor: [230, 230, 230] },
+    body: [
+      ["Einfache elektronische Signatur (EES)", data.ees || "0.80"]
+    ],
+    headStyles: { fillColor: grayLight },
     styles: { fontSize: 10 },
-    margin: { left: 20, right: 20 },
+    margin: { left: 20, right: 20 }
   });
 
-  // FES
+  // ---------------------------------------
+  // ✅ FES – Tabelle
+  // ---------------------------------------
   autoTable(pdf, {
     startY: pdf.lastAutoTable.finalY + 10,
     head: [["Beschreibung", "Preis (CHF)"]],
-    body: [["Fortgeschrittene elektronische Signatur (FES)", data.fes || "1.50"]],
-    headStyles: { fillColor: [230, 230, 230] },
+    body: [
+      ["Fortgeschrittene elektronische Signatur (FES)", data.fes || "1.50"]
+    ],
+    headStyles: { fillColor: grayLight },
     styles: { fontSize: 10 },
-    margin: { left: 20, right: 20 },
+    margin: { left: 20, right: 20 }
   });
 
-  // QES
+  // ---------------------------------------
+  // ✅ QES – Tabelle
+  // ---------------------------------------
   autoTable(pdf, {
     startY: pdf.lastAutoTable.finalY + 10,
     head: [["Beschreibung", "Preis (CHF)"]],
-    body: [["Qualifizierte elektronische Signatur (QES)", data.qes || "2.20"]],
-    headStyles: { fillColor: [230, 230, 230] },
+    body: [
+      ["Qualifizierte elektronische Signatur (QES)", data.qes || "2.20"]
+    ],
+    headStyles: { fillColor: grayLight },
     styles: { fontSize: 10 },
-    margin: { left: 20, right: 20 },
+    margin: { left: 20, right: 20 }
   });
 
-  // seal.ID
+
+  // ---------------------------------------
+  // ✅ Staffelpreise – seal.ID (neutral)
+  // ---------------------------------------
   autoTable(pdf, {
-    startY: pdf.lastAutoTable.finalY + 12,
+    startY: pdf.lastAutoTable.finalY + 15,
     head: [["Volumen pro Jahr", "Preis (CHF)"]],
     body: [
-      [data.sealIdVolume || "0–2500", data.sealIdPrice || "28.20"],
+      ["0 – 2’500", data.sealIdPrice || "28.20"],
+      ["2’501 – 5’000", "26.20"],
+      ["5’001 – 10’000", "24.20"],
+      ["> 10’000", "Nach Vereinbarung"]
     ],
-    headStyles: { fillColor: [230, 230, 230] },
+    headStyles: { fillColor: grayLight },
     styles: { fontSize: 10 },
-    margin: { left: 20, right: 20 },
+    margin: { left: 20, right: 20 }
   });
-
+}
+  drawSigningPage(pdf, data);
   pdf.addPage();
 
   // ------------------------------------------
