@@ -71,16 +71,16 @@ export function exportOfferPDF(data) {
     pdf.setFont("helvetica","bold");
     pdf.setFontSize(22);
     pdf.setTextColor(...colors.intrumViolet);
-    pdf.text("Offerte", 20, 20);
+    pdf.text("Offerte", 20, 30);
 
     // Text darunter mit Abstand
-    let y = 28;
+    let y = 35;
     pdf.setFont("helvetica","normal");
     pdf.setFontSize(11);
     pdf.setTextColor(...colors.textDark);
     pdf.text("Ausgearbeitet von",20,y);
 
-    y += 20;
+    y += 10;
     pdf.setFont("helvetica","bold");
     pdf.text("Intrum AG, Eschenstrasse 12, 8603 Schwerzenbach",20,y);
 
@@ -88,10 +88,10 @@ export function exportOfferPDF(data) {
     pdf.setFont("helvetica","normal");
     pdf.text("(nachfolgend Intrum genannt)",20,y);
 
-    y += 20;
+    y += 10;
     pdf.text("für",20,y);
 
-    y += 20;
+    y += 10;
     pdf.setFont("helvetica","bold");
     pdf.text("Firma (nachfolgend Partner genannt)",20,y);
 
