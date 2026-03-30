@@ -15,7 +15,11 @@ import LandingPage from "./components/LandingPage";
 import { translations } from "./i18n";
 import { exportPDF } from "./utils/pdfExport";
 
+import { useNavigate } from "react-router-dom";
+
 export default function App() {
+  const navigate = useNavigate();
+
   const [language, setLanguage] = useState("de");
   const t = translations[language];
 
@@ -32,6 +36,7 @@ export default function App() {
     co2Saved: 0,
   });
 
+  // ✅ LANDINGPAGE → DASHBOARD
   if (showLanding) {
     return (
       <LandingPage
@@ -50,30 +55,54 @@ export default function App() {
         <div className="dashboard-bg-gradient" />
 
         <div className="container mx-auto p-6 relative z-10">
+
+          {/* ✅ Kopfzeile Buttons */}
           <div className="flex justify-end mb-6 gap-4">
+
+            {/* ✅ Neuer Angebots-Button */}
+            <button
+              onClick={() => navigate("/offer")}
+              className="btn-primary"
+            >
+              Angebot erstellen
+            </button>
+
+            {/* ✅ Sprache */}
             <LanguageSwitcher language={language} setLanguage={setLanguage} />
 
+            {/* ✅ Impact PDF Export */}
             <button
               onClick={() => exportPDF(impactData, t)}
               className="btn-primary"
             >
               PDF Export
             </button>
+
           </div>
 
+          {/* ✅ Dashboard Hero */}
           <Hero t={t} />
 
+          {/* ✅ Calculator + Donut Chart + KPI */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 my-6">
-            <Calculator impactData={impactData} setImpactData={setImpactData} t={t} />
+            <Calculator
+              impactData={impactData}
+              setImpactData={setImpactData}
+              t={t}
+            />
+
             <ChartsSection data={impactData} t={t} />
+
             <KPISection data={impactData} t={t} />
           </div>
 
-          <div id="compare-section" className="grid grid-cols-1 md:grid-cols-2 gap-6 my-6">
+          {/* ✅ Benchmark + Comparison */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 my-6">
             <Benchmark data={impactData} t={t} />
             <Comparison data={impactData} t={t} />
           </div>
 
+          {/* ✅ Advanced Chart + CO₂ */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 my-6">
             <AdvancedImpactChart data={impactData} t={t} />
 
@@ -83,6 +112,7 @@ export default function App() {
             </div>
           </div>
 
+          {/* ✅ FOOTER */}
           <Footer t={t} />
         </div>
       </div>
