@@ -67,13 +67,11 @@ export function exportOfferPDF(data) {
   function drawCompanyPage() {
     drawHeaderFooter(2);
 
-    // Titel Offerte
     pdf.setFont("helvetica","bold");
     pdf.setFontSize(22);
     pdf.setTextColor(...colors.intrumViolet);
     pdf.text("Offerte", 20, 30);
 
-    // Text darunter mit Abstand
     let y = 55;
     pdf.setFont("helvetica","normal");
     pdf.setFontSize(11);
@@ -95,7 +93,6 @@ export function exportOfferPDF(data) {
     pdf.setFont("helvetica","bold");
     pdf.text("Firma (nachfolgend Partner genannt)",20,y);
 
-    // Block 1: Unternehmensdaten
     autoTable(pdf,{
       startY: y + 8,
       head:[["Angabe","Details"]],
@@ -110,7 +107,6 @@ export function exportOfferPDF(data) {
       styles:{fontSize:10.5,textColor:colors.textDark,lineColor:colors.border}
     });
 
-    // Block 2: Kontaktperson
     autoTable(pdf,{
       startY: pdf.lastAutoTable.finalY + 15,
       head:[["Ansprechperson","Details"]],
@@ -149,11 +145,10 @@ export function exportOfferPDF(data) {
       { title: "5  Gültigkeit des Angebots", page: "6" },
     ];
 
-    // Funktion: gepunktete Linie von nach dem Text bis zur Seitenzahl
     function drawDottedLineAfterText(text, y, pageX) {
-      const textWidth = pdf.getTextWidth(text) + 2; // kleine Lücke nach Text
+      const textWidth = pdf.getTextWidth(text) + 2;
       const startX = 20 + textWidth;
-      const endX = pageX - 8; // Abstand von Seitenzahl
+      const endX = pageX - 8;
       const dotSpacing = 2;
       for (let x = startX; x < endX; x += dotSpacing) {
         pdf.circle(x, y, 0.3, "F");
@@ -165,16 +160,50 @@ export function exportOfferPDF(data) {
       pdf.setFontSize(12);
       pdf.setTextColor(...colors.textDark);
 
-      // Text links
       pdf.text(row.title, 20, y);
-
-      // Gepunktete Linie nach Text bis rechts
       drawDottedLineAfterText(row.title, y, 190);
-
-      // Seitenzahl rechts
       pdf.text(row.page, 190, y, { align: "right" });
 
       y += 10;
+    });
+  }
+
+  // ---------------------------------------
+  // SEITE 4 – DIGITAL TRUST PLATFORM
+  // ---------------------------------------
+  function drawDTPPage() {
+    drawHeaderFooter(4);
+
+    let y = 25;
+    pdf.setFont("helvetica","bold");
+    pdf.setFontSize(18);
+    pdf.setTextColor(...colors.intrumViolet);
+    pdf.text("1  Digital Trust Platform – Die Grundlage für sichere und effiziente digitale Geschäftsprozesse",20,y);
+
+    y += 12;
+    pdf.setFont("helvetica","normal");
+    pdf.setFontSize(11);
+    pdf.setTextColor(...colors.textDark);
+
+    const paragraph =
+      "Die Digital Trust Platform (DTP) verbindet alle zentralen Elemente für ein durchgängig digitales und vertrauenswürdiges Onboarding in einer modular aufgebauten Lösung: von der Identifikation über Bonitäts- und Fraud-Prüfungen bis hin zur elektronischen Signatur – sicher, rechtskonform und effizient.\n" +
+      "Die Plattform wurde speziell dafür entwickelt, Unternehmen bei der Digitalisierung kritischer Prozesse zu unterstützen, ohne dabei Kompromisse bei Sicherheit, Nutzerfreundlichkeit oder regulatorischer Konformität einzugehen. Sie lässt sich flexibel in bestehende Systemlandschaften integrieren und ermöglicht so individuelle Customer Journeys mit hohem Automatisierungsgrad.\n" +
+      "Kernmodule der DTP sind:";
+
+    pdf.text(paragraph, 20, y, { maxWidth: 170, lineHeightFactor: 1.4 });
+
+    y += 50;
+
+    const bullets = [
+      "Identification: Verschiedene Verfahren wie AutoIdent, VideoIdent oder vor-Ort-Identifikation, je nach regulatorischen Anforderungen.",
+      "Smart Data: Intelligente Prüfungen wie Bonitätsbewertung (AI Credit Scores), Adressverifikation, Fraud Check und Compliance Screening – nahtlos eingebunden in den Onboarding-Prozess.",
+      "Signing: Elektronische Signatur mit Unterstützung aller drei Signaturstufen (EES, FES, QES), rechtssicher und benutzerfreundlich."
+    ];
+
+    bullets.forEach(b => {
+      pdf.circle(22, y - 2, 1.5, "F");
+      pdf.text(b, 27, y, { maxWidth: 160, lineHeightFactor: 1.4 });
+      y += 15;
     });
   }
 
@@ -186,6 +215,8 @@ export function exportOfferPDF(data) {
   drawCompanyPage();
   pdf.addPage();
   drawTableOfContents();
+  pdf.addPage();
+  drawDTPPage();
 
   pdf.save(`Offerte_${data.company || "Angebot"}.pdf`);
 }
