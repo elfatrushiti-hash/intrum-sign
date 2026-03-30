@@ -149,10 +149,14 @@ export function exportOfferPDF(data) {
       { title: "5  Gültigkeit des Angebots", page: "6" },
     ];
 
-    function drawDottedLine(x, y, width) {
+    // Funktion: gepunktete Linie von nach dem Text bis zur Seitenzahl
+    function drawDottedLineAfterText(text, y, pageX) {
+      const textWidth = pdf.getTextWidth(text) + 2; // kleine Lücke nach Text
+      const startX = 20 + textWidth;
+      const endX = pageX - 8; // Abstand von Seitenzahl
       const dotSpacing = 2;
-      for (let i = 0; i < width; i += dotSpacing) {
-        pdf.circle(x + i, y, 0.3, "F");
+      for (let x = startX; x < endX; x += dotSpacing) {
+        pdf.circle(x, y, 0.3, "F");
       }
     }
 
@@ -161,9 +165,15 @@ export function exportOfferPDF(data) {
       pdf.setFontSize(12);
       pdf.setTextColor(...colors.textDark);
 
+      // Text links
       pdf.text(row.title, 20, y);
-      drawDottedLine(20, y, 160);
+
+      // Gepunktete Linie nach Text bis rechts
+      drawDottedLineAfterText(row.title, y, 190);
+
+      // Seitenzahl rechts
       pdf.text(row.page, 190, y, { align: "right" });
+
       y += 10;
     });
   }
