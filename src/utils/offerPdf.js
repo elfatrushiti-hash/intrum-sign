@@ -10,7 +10,7 @@ export function exportOfferPDF(data) {
   // ------------------------------------------
   // ✅ COVER PAGE (Neutral, vektorbasierter Stil)
   // ------------------------------------------
- function drawCoverPage(pdf) {
+function drawCoverPage(pdf) {
   // Farben
   const purpleDark = [23, 4, 86];
   const purpleMid = [120, 50, 180];
@@ -50,6 +50,20 @@ export function exportOfferPDF(data) {
   pdf.text("intrum", 105, 265, { align: "center" });
 }
 
+// ---------------------------------------------
+// ✅ Hauptfunktion
+// ---------------------------------------------
+export function exportOfferPDF(data) {
+  const pdf = new jsPDF({
+    unit: "mm",
+    format: "a4"
+  });
+
+  // Seite 1
+  drawCoverPage(pdf);
+
+  // Seite 2 usw.
+  pdf.addPage();
   // ------------------------------------------
   // ✅ PAGE 2 – Company & Contact placeholders
   // ------------------------------------------
