@@ -3,85 +3,79 @@ import autoTable from "jspdf-autotable";
 
 export function exportOfferPDF(data) {
 
-  const pdf = new jsPDF({
-    unit: "mm",
-    format: "a4"
-  });
+  const pdf = new jsPDF({ unit: "mm", format: "a4" });
 
   const colors = {
-    primary: [0, 51, 153],
-    dark: [20, 30, 60],
-    text: [55, 65, 81],
-    light: [245, 248, 252],
-    border: [220, 226, 235]
+    primary: [23, 4, 86],      // Dunkles Purpur
+    secondary: [120, 50, 180], // Mittleres Purpur
+    accent: [150, 80, 210],    // Glow
+    textDark: [45, 45, 45],
+    textLight: [255,255,255],
+    cardBg: [245,245,250],
+    border: [220,220,230]
   };
 
-  // --------------------------------
-  // GLOBAL HEADER / FOOTER
-  // --------------------------------
+  // ---------------------------
+  // HEADER + FOOTER
+  // ---------------------------
   function drawHeaderFooter(page) {
-
-    // Top bar
+    // Top Bar
     pdf.setFillColor(...colors.primary);
     pdf.rect(0, 0, 210, 6, "F");
 
-    // Logo placeholder
-    pdf.setFont("helvetica", "bold");
+    // Logo Placeholder
+    pdf.setFont("helvetica","bold");
     pdf.setFontSize(10);
-    pdf.setTextColor(...colors.primary);
-    pdf.text("INTRUM", 190, 12, { align: "right" });
+    pdf.setTextColor(...colors.textLight);
+    pdf.text("INTRUM", 190, 12, {align:"right"});
 
     // Footer
-    pdf.setFont("helvetica", "normal");
+    pdf.setFont("helvetica","normal");
     pdf.setFontSize(9);
-    pdf.setTextColor(140,140,140);
-
+    pdf.setTextColor(120,120,120);
     pdf.text("Offerte – Digital Trust Platform", 20, 287);
-    pdf.text(`Seite ${page}`, 190, 287, { align: "right" });
+    pdf.text(`Seite ${page}`, 190, 287, {align:"right"});
   }
 
-  // --------------------------------
-  // PAGE 1 COVER
-  // --------------------------------
+  // ---------------------------
+  // COVER PAGE
+  // ---------------------------
   function drawCover() {
-
     pdf.setFillColor(...colors.primary);
     pdf.rect(0,0,210,297,"F");
 
-    pdf.setTextColor(255,255,255);
-    pdf.setFontSize(28);
+    pdf.setTextColor(...colors.textLight);
     pdf.setFont("helvetica","bold");
+    pdf.setFontSize(28);
     pdf.text("Offerte",20,80);
 
-    pdf.setFontSize(16);
     pdf.setFont("helvetica","normal");
+    pdf.setFontSize(16);
     pdf.text("Digital Trust Platform",20,95);
 
-    pdf.setFontSize(32);
     pdf.setFont("helvetica","bold");
+    pdf.setFontSize(32);
     pdf.text("INTRUM",105,260,{align:"center"});
   }
 
-  // --------------------------------
-  // PAGE 2 COMPANY
-  // --------------------------------
+  // ---------------------------
+  // COMPANY PAGE (Seite 2)
+  // ---------------------------
   function drawCompany() {
 
     drawHeaderFooter(2);
 
     pdf.setFont("helvetica","bold");
     pdf.setFontSize(20);
-    pdf.setTextColor(...colors.dark);
+    pdf.setTextColor(...colors.secondary);
     pdf.text("Unternehmensangaben",20,25);
 
     pdf.setFont("helvetica","normal");
     pdf.setFontSize(11);
-    pdf.setTextColor(...colors.text);
+    pdf.setTextColor(...colors.textDark);
     pdf.text(
       "Die folgenden Informationen bilden die Grundlage für die Zusammenarbeit.",
-      20,
-      35,
-      {maxWidth:170}
+      20, 35, { maxWidth: 170 }
     );
 
     autoTable(pdf,{
@@ -97,155 +91,106 @@ export function exportOfferPDF(data) {
         ["Telefon",data.contactPhone || "—"],
         ["E-Mail",data.contactEmail || "—"]
       ],
-      headStyles:{fillColor:colors.light,textColor:colors.dark},
-      styles:{fontSize:10.5,textColor:colors.text,lineColor:colors.border}
+      headStyles:{fillColor:colors.cardBg,textColor:colors.textDark,fontStyle:"bold"},
+      styles:{fontSize:10.5,textColor:colors.textDark,lineColor:colors.border}
     });
   }
 
-  // --------------------------------
-  // PAGE 3 TOC
-  // --------------------------------
-  function drawTOC() {
+  // ---------------------------
+  // PRODUCTS PAGE (Alle Produkte auf einer Seite)
+  // ---------------------------
+  function drawProducts() {
 
     drawHeaderFooter(3);
 
     pdf.setFont("helvetica","bold");
-    pdf.setFontSize(20);
-    pdf.setTextColor(...colors.dark);
-    pdf.text("Inhalt",20,25);
+    pdf.setFontSize(18);
+    pdf.setTextColor(...colors.secondary);
+    pdf.text("Produkte & Module",20,25);
 
-    const items = [
-      "Digital Trust Platform Überblick",
-      "Signing Optionen",
-      "Preisübersicht",
-      "Vertragsbedingungen"
+    pdf.setFont("helvetica","normal");
+    pdf.setFontSize(11);
+    pdf.setTextColor(...colors.textDark);
+    pdf.text("Übersicht aller verfügbaren Module und Preise:",20,35);
+
+    const modules = [
+      { title:"Onboarding", desc:"Digitale Kundenaufnahme", price:data.onboarding || "—" },
+      { title:"Identifikation", desc:"KYC & Verifizierung", price:data.identification || "—" },
+      { title:"Signing", desc:"Elektronische Signatur", price:data.signing || "—" },
+      { title:"Archivierung", desc:"Sichere Dokumentenablage", price:data.archiving || "—" },
+      { title:"Seal.ID", desc:"Authentifizierung", price:data.sealId || "—" },
+      { title:"Reporting", desc:"Datenanalyse & Reports", price:data.reporting || "—" }
     ];
 
-    let y=45;
+    const startX = 20;
+    const startY = 50;
+    const colWidth = 80;
+    const colHeight = 30;
+    const gapX = 10;
+    const gapY = 10;
+    let x = startX;
+    let y = startY;
 
-    items.forEach((item,i)=>{
+    modules.forEach((m,i)=>{
+      pdf.setFillColor(...colors.secondary);
+      pdf.rect(x,y,colWidth,colHeight,"F");
+
+      pdf.setFont("helvetica","bold");
+      pdf.setFontSize(11);
+      pdf.setTextColor(...colors.textLight);
+      pdf.text(m.title,x+5,y+8);
+
       pdf.setFont("helvetica","normal");
-      pdf.setFontSize(12);
-      pdf.text(`${i+1}. ${item}`,20,y);
-      pdf.text(`${i+4}`,190,y,{align:"right"});
-      y+=12;
+      pdf.setFontSize(10);
+      pdf.text(m.desc,x+5,y+16);
+      pdf.text(`Preis: ${m.price}`,x+5,y+24);
+
+      // Position für nächste Karte
+      if ((i+1)%2 === 0) {
+        x = startX;
+        y += colHeight + gapY;
+      } else {
+        x += colWidth + gapX;
+      }
     });
   }
 
-  // --------------------------------
-  // PAGE 4 CONTENT
-  // --------------------------------
-  function drawDTP() {
+  // ---------------------------
+  // FINAL SUMMARY PAGE
+  // ---------------------------
+  function drawFinal() {
 
     drawHeaderFooter(4);
 
     pdf.setFont("helvetica","bold");
     pdf.setFontSize(18);
-    pdf.text("Digital Trust Platform",20,25);
+    pdf.setTextColor(...colors.secondary);
+    pdf.text("Zusammenfassung & Bedingungen",20,25);
 
     pdf.setFont("helvetica","normal");
     pdf.setFontSize(11);
+    pdf.setTextColor(...colors.textDark);
     pdf.text(
-      "Die Digital Trust Platform ermöglicht eine sichere, skalierbare und vollständig digitale Kundeninteraktion.",
-      20,
-      35,
-      {maxWidth:170}
+      `Gültig bis: ${data.validUntil || "—"}`,
+      20, 40
     );
 
-    const cards = [
-      "Onboarding",
-      "Identifikation",
-      "Signing",
-      "Archivierung"
-    ];
-
-    cards.forEach((c,i)=>{
-      const x = 20 + (i%2)*85;
-      const y = 60 + Math.floor(i/2)*40;
-
-      pdf.setFillColor(...colors.light);
-      pdf.rect(x,y,80,30,"F");
-
-      pdf.setFont("helvetica","bold");
-      pdf.text(c,x+5,y+10);
-    });
-  }
-
-  // --------------------------------
-  // PAGE 5 PRICING
-  // --------------------------------
-  function drawPricing() {
-
-    drawHeaderFooter(5);
-
-    pdf.setFont("helvetica","bold");
-    pdf.setFontSize(18);
-    pdf.text("Signing Optionen",20,25);
-
-    const pricing = [
-      ["EES","0.80 CHF"],
-      ["FES","1.50 CHF"],
-      ["QES","2.20 CHF"]
-    ];
-
-    pricing.forEach((p,i)=>{
-      const x = 20 + i*60;
-
-      pdf.setFillColor(...colors.light);
-      pdf.rect(x,50,50,40,"F");
-
-      pdf.setFont("helvetica","bold");
-      pdf.text(p[0],x+5,65);
-
-      pdf.setFont("helvetica","normal");
-      pdf.text(p[1],x+5,80);
-    });
-  }
-
-  // --------------------------------
-  // PAGE 6 FINAL
-  // --------------------------------
-  function drawFinal() {
-
-    drawHeaderFooter(6);
-
-    pdf.setFont("helvetica","bold");
-    pdf.setFontSize(18);
-    pdf.text("Preisübersicht",20,25);
-
-    autoTable(pdf,{
-      startY:40,
-      head:[["Beschreibung","Preis"]],
-      body:[
-        ["Setup Fee","5500 CHF"],
-        ["Ongoing Fee","2500 CHF"],
-        ["White Labeling","2500 CHF"]
-      ],
-      headStyles:{fillColor:colors.light},
-      styles:{fontSize:10}
-    });
-
     pdf.text(
-      `Gültig bis: ${data.validUntil || ""}`,
-      20,
-      pdf.lastAutoTable.finalY + 20
+      "Dieses Dokument stellt eine Übersicht aller Module und Preise dar. Alle Angaben ohne Gewähr.",
+      20, 50, { maxWidth:170, lineHeightFactor:1.4 }
     );
   }
 
+  // ---------------------------
   // BUILD PDF
+  // ---------------------------
   drawCover();
   pdf.addPage();
 
   drawCompany();
   pdf.addPage();
 
-  drawTOC();
-  pdf.addPage();
-
-  drawDTP();
-  pdf.addPage();
-
-  drawPricing();
+  drawProducts();
   pdf.addPage();
 
   drawFinal();
