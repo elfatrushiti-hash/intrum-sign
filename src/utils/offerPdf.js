@@ -82,101 +82,108 @@ function drawCoverPage(pdf) {
 }
   drawCoverPage(pdf);
   pdf.addPage();
- 
 // ----------------------------------------------------------
-// ✅ Seite 2 – Modernisierte Firmeninformationen (neutral)
+// ✅ Seite 2 – Moderne M2-Version (neutral, professionell)
 // ----------------------------------------------------------
 function drawCompanyPage(pdf, data) {
 
-  // Farben & Typo
-  const grayLight = [245, 245, 245];
-  const grayBorder = [210, 210, 210];
-  const grayText = [70, 70, 70];
-  const titleColor = [23, 4, 86]; // Purple Accent
+  // Farben im Material-Design-Stil
+  const grayBg = [250, 250, 250];
+  const grayBorder = [225, 225, 225];
+  const textPrimary = [45, 45, 45];
+  const textSecondary = [100, 100, 100];
+  const accent = [76, 86, 219]; // Modern Indigo (Material UI)
 
-  // Page Margins
   const marginLeft = 20;
-  const marginTop = 22;
+  const marginTop = 25;
 
   // ----------------------------------------------------------
-  // ✅ 1. Modernes Seiten-Header-Label
+  // ✅ 1. Moderner Titel
   // ----------------------------------------------------------
-  pdf.setFillColor(...titleColor);
-  pdf.rect(marginLeft, marginTop - 10, 170, 8, "F");
-
   pdf.setFont("helvetica", "bold");
-  pdf.setFontSize(13);
-  pdf.setTextColor(255, 255, 255);
-  pdf.text("Firmeninformationen", marginLeft + 3, marginTop - 4);
+  pdf.setFontSize(22);
+  pdf.setTextColor(...accent);
+  pdf.text("Firmeninformationen", marginLeft, marginTop);
 
   // ----------------------------------------------------------
-  // ✅ 2. Untertitel / Lead‑Text (modern, grauer Ton)
+  // ✅ 2. Untertitel / Beschreibung
   // ----------------------------------------------------------
   pdf.setFont("helvetica", "normal");
-  pdf.setFontSize(10.5);
-  pdf.setTextColor(...grayText);
+  pdf.setFontSize(11);
+  pdf.setTextColor(...textSecondary);
+
   pdf.text(
-    "Übersicht der relevanten Firmen- und Kontaktangaben.",
+    "Diese Übersicht enthält alle relevanten Unternehmens- und Kontaktdaten.",
     marginLeft,
-    marginTop + 8
+    marginTop + 12,
+    { maxWidth: 170 }
   );
 
-  // Spacing zur Tabelle
-  let startY = marginTop + 16;
+  // Abstand zur Tabelle
+  let startY = marginTop + 22;
 
   // ----------------------------------------------------------
-  // ✅ 3. Moderne Tabelle (mit cleanem UI, leichter Schattierung)
+  // ✅ 3. Moderne M2-Tabelle (Karten-Stil)
   // ----------------------------------------------------------
   autoTable(pdf, {
     startY: startY,
+
+    // Kopfzeile
     head: [["Angabe", "Wert"]],
+
+    // Inhalte
     body: [
       ["Firmenname", data.company || "—"],
       ["UID", data.uid || "—"],
-      ["Handelsregister (Ja/Nein)", data.hrRegister || "—"],
+      ["Handelsregister", data.hrRegister || "—"],
       ["Strasse / Nr", data.street || "—"],
       ["PLZ / Ort", `${data.postcode || ""} ${data.city || ""}` || "—"],
       ["Postfach", data.poBox || "—"],
       ["PLZ/Ort (Postfach)", data.poPostcode || "—"],
       ["Kontaktperson", data.contactName || "—"],
       ["Telefon", data.contactPhone || "—"],
-      ["E-Mail", data.contactEmail || "—"],
+      ["E-Mail", data.contactEmail || "—"]
     ],
 
+    // ------------------------------
+    // ✅ M2 Styling
+    // ------------------------------
     styles: {
       font: "helvetica",
-      fontSize: 10.5,
-      cellPadding: 4.5,
-      textColor: grayText,
-      lineWidth: 0.2,
+      fontSize: 10.8,
+      textColor: textPrimary,
+      cellPadding: { top: 6, bottom: 6, left: 4, right: 4 },
+      lineWidth: 0.4,
       lineColor: grayBorder
     },
 
     headStyles: {
-      fillColor: grayLight,
-      textColor: [40, 40, 40],
+      fillColor: grayBg,
+      textColor: textSecondary,
       fontStyle: "bold",
-      lineWidth: 0
+      fontSize: 11,
+      halign: "left"
     },
 
     alternateRowStyles: {
-      fillColor: [250, 250, 250]
+      fillColor: [255, 255, 255]
     },
 
     margin: { left: marginLeft, right: marginLeft },
-    tableWidth: 170,
+    tableWidth: "auto",
+
+    theme: "grid"
   });
 
   // ----------------------------------------------------------
-  // ✅ 4. Optional: dezente Section‑Trennlinie (modern)
+  // ✅ 4. Dezenter Abschluss-Strich (M2 Divider)
   // ----------------------------------------------------------
-  let nextY = pdf.lastAutoTable.finalY + 12;
-  pdf.setDrawColor(...grayBorder);
-  pdf.setLineWidth(0.4);
-  pdf.line(marginLeft, nextY, marginLeft + 170, nextY);
+  const endY = pdf.lastAutoTable.finalY + 10;
 
-  // Bereit für weitere Abschnitte
-}
+  pdf.setDrawColor(...grayBorder);
+  pdf.setLineWidth(0.6);
+  pdf.line(marginLeft, endY, marginLeft + 170, endY);
+}  
   drawCompanyPage(pdf, data);
   pdf.addPage();
   
