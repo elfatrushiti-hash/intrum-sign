@@ -209,56 +209,7 @@ function drawDTPPage(pdf) {
     bulletY += 8;
   });
 
-  // ----------------------------------------------------------
-// ✅ Seite 4 – "Digital Trust Platform" (neutral)
-// ----------------------------------------------------------
-function drawDTPPage(pdf) {
-  const purpleDark = [23, 4, 86];
-  const purpleLight = [140, 70, 200];
-  const grayText = [60, 60, 60];
-
-  // ----------------------------------------------------------
-  // ✅ SEITEN-ÜBERSCHRIFT
-  // ----------------------------------------------------------
-  pdf.setFont("helvetica", "bold");
-  pdf.setFontSize(18);
-  pdf.setTextColor(...purpleDark);
-  pdf.text("1. Digital Trust Platform – Überblick", 20, 20);
-
-  // ----------------------------------------------------------
-  // ✅ EINLEITENDER ABSATZ (neutraler Beispieltext)
-  //    → DU ersetzt ihn später durch deinen echten Abschnitt
-  // ----------------------------------------------------------
-  const paragraph = 
-    "Dies ist ein neutraler Platzhaltertext für die Beschreibung " +
-    "einer digitalen Vertrauensplattform. Du kannst hier jede Beschreibung " +
-    "einfügen, die du für dein Offerte-Dokument benötigst. Dieser Absatz " +
-    "soll lediglich demonstrieren, wie Fließtext auf Seite 4 dargestellt wird. ";
-
-  pdf.setFont("helvetica", "normal");
-  pdf.setFontSize(11);
-  pdf.setTextColor(...grayText);
-
-  pdf.text(paragraph, 20, 35, { maxWidth: 170, lineHeightFactor: 1.4 });
-
-  // ----------------------------------------------------------
-  // ✅ BULLET-POINT LISTE (neutral)
-  // ----------------------------------------------------------
-  const bulletPoints = [
-    "Modulbereich A – Beispielinhalt.",
-    "Modulbereich B – Beispielinhalt.",
-    "Modulbereich C – Beispielinhalt."
-  ];
-
-  let bulletY = 70;
-
-  bulletPoints.forEach(point => {
-    pdf.circle(25, bulletY - 2, 1.5, "F");   // Bullet-Kreis
-    pdf.text(point, 30, bulletY);
-    bulletY += 8;
-  });
-
-  // ----------------------------------------------------------
+ // ----------------------------------------------------------
   // ✅ 4-SPALTEN-MODULGRAFIK (neutral)
   // ----------------------------------------------------------
   const columns = [
