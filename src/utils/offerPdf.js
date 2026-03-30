@@ -4,8 +4,20 @@
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 
+
 export function exportOfferPDF(data) {
-  const pdf = new jsPDF({ unit: "mm", format: "a4" });
+  const pdf = new jsPDF({
+    unit: "mm",
+    format: "a4"
+  });
+
+  // ✅ Seite 1 (Deckblatt)
+  drawCoverPage(pdf);
+
+  // ✅ Seite 2
+  pdf.addPage();
+  drawCompanyPage(pdf, data);
+
 
   // ------------------------------------------
   // ✅ COVER PAGE (Neutral, vektorbasierter Stil)
@@ -87,11 +99,6 @@ function drawCompanyPage(pdf, data) {
     margin: { left: 20, right: 20 }
   });
 }
-export function exportOfferPDF(data) {
-  const pdf = new jsPDF({
-    unit: "mm",
-    format: "a4"
-  });
   pdf.addPage();
   // ------------------------------------------
   // ✅ PAGE 3 – Inhaltsverzeichnis (Neutral)
