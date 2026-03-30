@@ -80,7 +80,7 @@ export function exportOfferPDF(data) {
     pdf.setTextColor(...colors.textDark);
     pdf.text("Ausgearbeitet von",20,y);
 
-    y += 6;
+    y += 20;
     pdf.setFont("helvetica","bold");
     pdf.text("Intrum AG, Eschenstrasse 12, 8603 Schwerzenbach",20,y);
 
@@ -88,8 +88,12 @@ export function exportOfferPDF(data) {
     pdf.setFont("helvetica","normal");
     pdf.text("(nachfolgend Intrum genannt)",20,y);
 
-    y += 6;
+    y += 20;
     pdf.text("für",20,y);
+
+    y += 20;
+    pdf.setFont("helvetica","bold");
+    pdf.text("Firma (nachfolgend Partner genannt)",20,y);
 
     // Block 1: Unternehmensdaten
     autoTable(pdf,{
