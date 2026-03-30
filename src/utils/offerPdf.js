@@ -17,7 +17,17 @@ export function exportOfferPDF(data) {
   // ✅ Seite 2
   drawCompanyPage(pdf, data);
 
+  // ✅ Seite 3
+  drawTableOfContents(pdf);
 
+function drawDottedLine(pdf, x, y, width) {
+  const dotCount = Math.floor(width / 2); // Menge der Punkte, anpassen falls nötig
+  const dots = ".".repeat(dotCount);
+
+  pdf.setFont("helvetica", "normal");
+  pdf.setFontSize(10);
+  pdf.text(dots, x, y);
+}
   // ------------------------------------------
   // ✅ COVER PAGE (Neutral, vektorbasierter Stil)
   // ------------------------------------------
@@ -100,37 +110,50 @@ function drawCompanyPage(pdf, data) {
 }
   drawCompanyPage(pdf, data);
   pdf.addPage();
-  // ------------------------------------------
-  // ✅ PAGE 3 – Inhaltsverzeichnis (Neutral)
-  // ------------------------------------------
+  // ----------------------------------------------------------
+// ✅ Seite 3 – Inhaltsverzeichnis (neutral & funktionsfähig)
+// ----------------------------------------------------------
+function drawTableOfContents(pdf) {
+
+  // Titel "Inhalt"
   pdf.setFont("helvetica", "bold");
-  pdf.setFontSize(18);
+  pdf.setFontSize(20);
+  pdf.setTextColor(0,0,0);
   pdf.text("Inhalt", 20, 20);
 
+  // Position Start
+  let y = 40;
+
+  // Liste aller Kapitel (Beispiele – DU bestimmst diese!)
   const toc = [
-    ["1  Digital Trust Platform – Überblick", "4"],
-    ["2  SIGNING", "5"],
-    ["3  Setup Gebühren", "6"],
-    ["4  Verschwiegenheitsklausel", "6"],
-    ["5  Gültigkeit des Angebots", "6"],
+    { title: "1  Digital Trust Platform – Überblick", page: "4" },
+    { title: "2  SIGNING", page: "5" },
+    { title: "   2.1  EES – Einfache Signatur", page: "5" },
+    { title: "   2.2  FES – Fortgeschrittene Signatur", page: "5" },
+    { title: "   2.3  QES – Qualifizierte Signatur", page: "5" },
+    { title: "   2.4  Identifikation / seal.ID", page: "5" },
+    { title: "3  Setup Gebühren", page: "6" },
+    { title: "4  Verschwiegenheitsklausel", page: "6" },
+    { title: "5  Gültigkeit des Angebots", page: "6" },
   ];
 
-  let y = 35;
+  // Rendering der Liste
+  toc.forEach(row => {
+    // Kapiteltext
+    pdf.setFont("helvetica", "normal");
+    pdf.setFontSize(12);
+    pdf.text(row.title, 20, y);
 
-  pdf.setFont("helvetica", "normal");
-  pdf.setFontSize(12);
+    // Dotted Line
+    drawDottedLine(pdf, 20, y, 150);
 
-  toc.forEach((row) => {
-    pdf.text(row[0], 20, y);
-    pdf.text(row[1], 190, y, { align: "right" });
+    // Seitenzahl rechtsbündig
+    pdf.text(row.page, 190, y, { align: "right" });
 
-    // dotted leader
-    const dots = ".".repeat(60);
-    pdf.text(dots, 20, y);
-
-    y += 10;
+    y += 10; // spacing
   });
-
+}
+  drawTableOfContents(pdf);
   pdf.addPage();
 
   // ------------------------------------------
