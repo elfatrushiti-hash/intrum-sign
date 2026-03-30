@@ -1,505 +1,254 @@
-// Neutral offerPdf.js Template – No personal data included
-// Uses placeholders for all dynamic fields.
-
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 
-
 export function exportOfferPDF(data) {
+
   const pdf = new jsPDF({
     unit: "mm",
     format: "a4"
   });
 
-  // ✅ Seite 1 (Deckblatt)
-  drawCoverPage(pdf);
+  const colors = {
+    primary: [0, 51, 153],
+    dark: [20, 30, 60],
+    text: [55, 65, 81],
+    light: [245, 248, 252],
+    border: [220, 226, 235]
+  };
 
-  // ✅ Seite 2
-  drawCompanyPage(pdf, data);
+  // --------------------------------
+  // GLOBAL HEADER / FOOTER
+  // --------------------------------
+  function drawHeaderFooter(page) {
 
-  // ✅ Seite 3
-  drawTableOfContents(pdf);
+    // Top bar
+    pdf.setFillColor(...colors.primary);
+    pdf.rect(0, 0, 210, 6, "F");
 
-  // ✅ Seite 4
-  drawDTPPage(pdf);
-  
- // ✅ Seite 5
-  drawSigningPage(pdf, data);
-
-  
-  // ✅ Seite 6
-  drawFinalPage(pdf, data);
-
-function drawDottedLine(pdf, x, y, width) {
-  const dotCount = Math.floor(width / 2); // Menge der Punkte, anpassen falls nötig
-  const dots = " ".repeat(dotCount);
-
-  pdf.setFont("helvetica", "normal");
-  pdf.setFontSize(10);
-  pdf.text(dots, x, y);
-}
-  // ------------------------------------------
-  // ✅ COVER PAGE (Neutral, vektorbasierter Stil)
-  // ------------------------------------------
-function drawCoverPage(pdf) {
-  // Farben
-  const purpleDark = [23, 4, 86];
-  const purpleMid = [120, 50, 180];
-  const purpleSoft = [140, 70, 200];
-  const white = [255, 255, 255];
-
-  // Hintergrundfläche
-  pdf.setFillColor(...purpleDark);
-  pdf.rect(0, 0, 210, 297, "F");
-
-  // Glow 1
-  pdf.setFillColor(140, 70, 200, 0.50);
-  pdf.circle(40, 60, 60, "F");
-
-  // Glow 2
-  pdf.setFillColor(120, 50, 180, 0.30);
-  pdf.circle(120, 150, 80, "F");
-
-  // Glow 3
-  pdf.setFillColor(150, 80, 210, 0.35);
-  pdf.circle(180, 260, 100, "F");
-
-  // Titel
-  pdf.setFont("helvetica", "bold");
-  pdf.setFontSize(30);
-  pdf.setTextColor(...white);
-  pdf.text("Offerte", 25, 60);
-
-  // Untertitel
-  pdf.setFont("helvetica", "normal");
-  pdf.setFontSize(16);
-  pdf.text("Digital Onboarding", 25, 80);
-
-  // Markenname unten
-  pdf.setFont("helvetica", "bold");
-  pdf.setFontSize(32);
-  pdf.text("intrum", 105, 265, { align: "center" });
-}
-  drawCoverPage(pdf);
-  pdf.addPage();
-// ----------------------------------------------------------
-// ✅ Seite 2 – Moderne M2-Version (neutral, professionell)
-// ----------------------------------------------------------
-function drawCompanyPage(pdf, data) {
-
-  // Farben im Material-Design-Stil
-  const grayBg = [250, 250, 250];
-  const grayBorder = [225, 225, 225];
-  const textPrimary = [45, 45, 45];
-  const textSecondary = [100, 100, 100];
-  const accent = [76, 86, 219]; // Modern Indigo (Material UI)
-
-  const marginLeft = 20;
-  const marginTop = 25;
-
-  // ----------------------------------------------------------
-  // ✅ 1. Moderner Titel
-  // ----------------------------------------------------------
-  pdf.setFont("helvetica", "bold");
-  pdf.setFontSize(22);
-  pdf.setTextColor(...accent);
-  pdf.text("Firmeninformationen", marginLeft, marginTop);
-
-  // ----------------------------------------------------------
-  // ✅ 2. Untertitel / Beschreibung
-  // ----------------------------------------------------------
-  pdf.setFont("helvetica", "normal");
-  pdf.setFontSize(11);
-  pdf.setTextColor(...textSecondary);
-
-  pdf.text(
-    "Diese Übersicht enthält alle relevanten Unternehmens- und Kontaktdaten.",
-    marginLeft,
-    marginTop + 12,
-    { maxWidth: 170 }
-  );
-
-  // Abstand zur Tabelle
-  let startY = marginTop + 22;
-
-  // ----------------------------------------------------------
-  // ✅ 3. Moderne M2-Tabelle (Karten-Stil)
-  // ----------------------------------------------------------
-  autoTable(pdf, {
-    startY: startY,
-
-    // Kopfzeile
-    head: [["Angabe", "Wert"]],
-
-    // Inhalte
-    body: [
-      ["Firmenname", data.company || "—"],
-      ["UID", data.uid || "—"],
-      ["Handelsregister", data.hrRegister || "—"],
-      ["Strasse / Nr", data.street || "—"],
-      ["PLZ / Ort", `${data.postcode || ""} ${data.city || ""}` || "—"],
-      ["Postfach", data.poBox || "—"],
-      ["PLZ/Ort (Postfach)", data.poPostcode || "—"],
-      ["Kontaktperson", data.contactName || "—"],
-      ["Telefon", data.contactPhone || "—"],
-      ["E-Mail", data.contactEmail || "—"]
-    ],
-
-    // ------------------------------
-    // ✅ M2 Styling
-    // ------------------------------
-    styles: {
-      font: "helvetica",
-      fontSize: 10.8,
-      textColor: textPrimary,
-      cellPadding: { top: 6, bottom: 6, left: 4, right: 4 },
-      lineWidth: 0.4,
-      lineColor: grayBorder
-    },
-
-    headStyles: {
-      fillColor: grayBg,
-      textColor: textSecondary,
-      fontStyle: "bold",
-      fontSize: 11,
-      halign: "left"
-    },
-
-    alternateRowStyles: {
-      fillColor: [255, 255, 255]
-    },
-
-    margin: { left: marginLeft, right: marginLeft },
-    tableWidth: "auto",
-
-    theme: "grid"
-  });
-
-  // ----------------------------------------------------------
-  // ✅ 4. Dezenter Abschluss-Strich (M2 Divider)
-  // ----------------------------------------------------------
-  const endY = pdf.lastAutoTable.finalY + 10;
-
-  pdf.setDrawColor(...grayBorder);
-  pdf.setLineWidth(0.6);
-  pdf.line(marginLeft, endY, marginLeft + 170, endY);
-}  
-  drawCompanyPage(pdf, data);
-  pdf.addPage();
-  
-  // ----------------------------------------------------------
-// ✅ Seite 3 – Inhaltsverzeichnis (neutral & funktionsfähig)
-// ----------------------------------------------------------
-function drawTableOfContents(pdf) {
-
-  // Titel "Inhalt"
-  pdf.setFont("helvetica", "bold");
-  pdf.setFontSize(20);
-  pdf.setTextColor(0,0,0);
-  pdf.text("Inhalt", 20, 20);
-
-  // Position Start
-  let y = 40;
-
-  // Liste aller Kapitel (Beispiele – DU bestimmst diese!)
-  const toc = [
-    { title: "1  Digital Trust Platform – Überblick", page: "4" },
-    { title: "2  SIGNING", page: "5" },
-    { title: "   2.1  EES – Einfache Signatur", page: "5" },
-    { title: "   2.2  FES – Fortgeschrittene Signatur", page: "5" },
-    { title: "   2.3  QES – Qualifizierte Signatur", page: "5" },
-    { title: "   2.4  Identifikation / seal.ID", page: "5" },
-    { title: "3  Setup Gebühren", page: "6" },
-    { title: "4  Verschwiegenheitsklausel", page: "6" },
-    { title: "5  Gültigkeit des Angebots", page: "6" },
-  ];
-
-  // Rendering der Liste
-  toc.forEach(row => {
-    // Kapiteltext
-    pdf.setFont("helvetica", "normal");
-    pdf.setFontSize(12);
-    pdf.text(row.title, 20, y);
-
-    // Dotted Line
-    drawDottedLine(pdf, 20, y, 150);
-
-    // Seitenzahl rechtsbündig
-    pdf.text(row.page, 190, y, { align: "right" });
-
-    y += 10; // spacing
-  });
-}
-  drawTableOfContents(pdf);
-  pdf.addPage();
-
- // ----------------------------------------------------------
-// ✅ Seite 4 – "Digital Trust Platform" (neutral)
-// ----------------------------------------------------------
-function drawDTPPage(pdf) {
-  const purpleDark = [23, 4, 86];
-  const purpleLight = [140, 70, 200];
-  const grayText = [60, 60, 60];
-
-  // ----------------------------------------------------------
-  // ✅ SEITEN-ÜBERSCHRIFT
-  // ----------------------------------------------------------
-  pdf.setFont("helvetica", "bold");
-  pdf.setFontSize(18);
-  pdf.setTextColor(...purpleDark);
-  pdf.text("1. Digital Trust Platform – Überblick", 20, 20);
-
-  // ----------------------------------------------------------
-  // ✅ EINLEITENDER ABSATZ (neutraler Beispieltext)
-  //    → DU ersetzt ihn später durch deinen echten Abschnitt
-  // ----------------------------------------------------------
-  const paragraph = 
-    "Dies ist ein neutraler Platzhaltertext für die Beschreibung " +
-    "einer digitalen Vertrauensplattform. Du kannst hier jede Beschreibung " +
-    "einfügen, die du für dein Offerte-Dokument benötigst. Dieser Absatz " +
-    "soll lediglich demonstrieren, wie Fließtext auf Seite 4 dargestellt wird. ";
-
-  pdf.setFont("helvetica", "normal");
-  pdf.setFontSize(11);
-  pdf.setTextColor(...grayText);
-
-  pdf.text(paragraph, 20, 35, { maxWidth: 170, lineHeightFactor: 1.4 });
-
-  // ----------------------------------------------------------
-  // ✅ BULLET-POINT LISTE (neutral)
-  // ----------------------------------------------------------
-  const bulletPoints = [
-    "Modulbereich A – Beispielinhalt.",
-    "Modulbereich B – Beispielinhalt.",
-    "Modulbereich C – Beispielinhalt."
-  ];
-
-  let bulletY = 70;
-
-  bulletPoints.forEach(point => {
-    pdf.circle(25, bulletY - 2, 1.5, "F");   // Bullet-Kreis
-    pdf.text(point, 30, bulletY);
-    bulletY += 8;
-  });
-
- // ----------------------------------------------------------
-  // ✅ 4-SPALTEN-MODULGRAFIK (neutral)
-  // ----------------------------------------------------------
-  const columns = [
-    { title: "MODUL A", fields: ["Funktion 1", "Funktion 2", "Funktion 3"] },
-    { title: "MODUL B", fields: ["Funktion 1", "Funktion 2"] },
-    { title: "MODUL C", fields: ["Funktion 1"] },
-    { title: "MODUL D", fields: ["Funktion 1", "Funktion 2"] }
-  ];
-
-  const colWidth = 40;
-  const colStartX = 20;
-  const colStartY = 105;
-
-  columns.forEach((col, index) => {
-    const x = colStartX + index * (colWidth + 6);
-
-    // Titelbox
-    pdf.setFillColor(...purpleDark);
-    pdf.rect(x, colStartY, colWidth, 12, "F");
-
+    // Logo placeholder
     pdf.setFont("helvetica", "bold");
     pdf.setFontSize(10);
-    pdf.setTextColor(255, 255, 255);
-    pdf.text(col.title, x + 3, colStartY + 8);
+    pdf.setTextColor(...colors.primary);
+    pdf.text("INTRUM", 190, 12, { align: "right" });
 
-    // Felder
-    col.fields.forEach((field, fIndex) => {
-      const y = colStartY + 15 + fIndex * 12;
-      pdf.setFillColor(...purpleLight);
-      pdf.rect(x, y, colWidth, 10, "F");
+    // Footer
+    pdf.setFont("helvetica", "normal");
+    pdf.setFontSize(9);
+    pdf.setTextColor(140,140,140);
 
-      pdf.setFont("helvetica", "normal");
-      pdf.setTextColor(255, 255, 255);
-      pdf.text(field, x + 3, y + 7);
+    pdf.text("Offerte – Digital Trust Platform", 20, 287);
+    pdf.text(`Seite ${page}`, 190, 287, { align: "right" });
+  }
+
+  // --------------------------------
+  // PAGE 1 COVER
+  // --------------------------------
+  function drawCover() {
+
+    pdf.setFillColor(...colors.primary);
+    pdf.rect(0,0,210,297,"F");
+
+    pdf.setTextColor(255,255,255);
+    pdf.setFontSize(28);
+    pdf.setFont("helvetica","bold");
+    pdf.text("Offerte",20,80);
+
+    pdf.setFontSize(16);
+    pdf.setFont("helvetica","normal");
+    pdf.text("Digital Trust Platform",20,95);
+
+    pdf.setFontSize(32);
+    pdf.setFont("helvetica","bold");
+    pdf.text("INTRUM",105,260,{align:"center"});
+  }
+
+  // --------------------------------
+  // PAGE 2 COMPANY
+  // --------------------------------
+  function drawCompany() {
+
+    drawHeaderFooter(2);
+
+    pdf.setFont("helvetica","bold");
+    pdf.setFontSize(20);
+    pdf.setTextColor(...colors.dark);
+    pdf.text("Unternehmensangaben",20,25);
+
+    pdf.setFont("helvetica","normal");
+    pdf.setFontSize(11);
+    pdf.setTextColor(...colors.text);
+    pdf.text(
+      "Die folgenden Informationen bilden die Grundlage für die Zusammenarbeit.",
+      20,
+      35,
+      {maxWidth:170}
+    );
+
+    autoTable(pdf,{
+      startY:45,
+      head:[["Angabe","Details"]],
+      body:[
+        ["Firmenname",data.company || "—"],
+        ["UID",data.uid || "—"],
+        ["Handelsregister",data.hrRegister || "—"],
+        ["Adresse",data.street || "—"],
+        ["PLZ / Ort",`${data.postcode || ""} ${data.city || ""}`],
+        ["Kontaktperson",data.contactName || "—"],
+        ["Telefon",data.contactPhone || "—"],
+        ["E-Mail",data.contactEmail || "—"]
+      ],
+      headStyles:{fillColor:colors.light,textColor:colors.dark},
+      styles:{fontSize:10.5,textColor:colors.text,lineColor:colors.border}
     });
-  });
-}
-  drawDTPPage(pdf);
-  pdf.addPage();
-  
- // ----------------------------------------------------------
-// ✅ Seite 5 – SIGNING (neutraler Aufbau)
-// ----------------------------------------------------------
-function drawSigningPage(pdf, data) {
+  }
 
-  const grayLight = [240, 240, 240];
-  const textColor = [0, 0, 0];
+  // --------------------------------
+  // PAGE 3 TOC
+  // --------------------------------
+  function drawTOC() {
 
-  // ---------------------------------------
-  // ✅ Kapitelüberschrift
-  // ---------------------------------------
-  pdf.setFont("helvetica", "bold");
-  pdf.setFontSize(18);
-  pdf.setTextColor(...textColor);
-  pdf.text("2. SIGNING", 20, 20);
+    drawHeaderFooter(3);
 
-  // ---------------------------------------
-  // ✅ Einleitungstext (neutral)
-  // ---------------------------------------
-  pdf.setFont("helvetica", "normal");
-  pdf.setFontSize(11);
-  
-  const introText =
-    "Dieser Abschnitt beschreibt die verschiedenen elektronischen Signaturstufen " +
-    "(EES, FES, QES) und ergänzt diese um ein neutrales Preisbeispiel. " +
-    "Diese Texte kannst du frei durch deine eigenen Inhalte ersetzen.";
+    pdf.setFont("helvetica","bold");
+    pdf.setFontSize(20);
+    pdf.setTextColor(...colors.dark);
+    pdf.text("Inhalt",20,25);
 
-  pdf.text(introText, 20, 32, { maxWidth: 170, lineHeightFactor: 1.4 });
+    const items = [
+      "Digital Trust Platform Überblick",
+      "Signing Optionen",
+      "Preisübersicht",
+      "Vertragsbedingungen"
+    ];
 
+    let y=45;
 
-  // ---------------------------------------
-  // ✅ EES – Tabelle
-  // ---------------------------------------
-  autoTable(pdf, {
-    startY: 55,
-    head: [["Beschreibung", "Preis (CHF)"]],
-    body: [
-      ["Einfache elektronische Signatur (EES)", data.ees || "0.80"]
-    ],
-    headStyles: { fillColor: grayLight },
-    styles: { fontSize: 10 },
-    margin: { left: 20, right: 20 }
-  });
+    items.forEach((item,i)=>{
+      pdf.setFont("helvetica","normal");
+      pdf.setFontSize(12);
+      pdf.text(`${i+1}. ${item}`,20,y);
+      pdf.text(`${i+4}`,190,y,{align:"right"});
+      y+=12;
+    });
+  }
 
-  // ---------------------------------------
-  // ✅ FES – Tabelle
-  // ---------------------------------------
-  autoTable(pdf, {
-    startY: pdf.lastAutoTable.finalY + 10,
-    head: [["Beschreibung", "Preis (CHF)"]],
-    body: [
-      ["Fortgeschrittene elektronische Signatur (FES)", data.fes || "1.50"]
-    ],
-    headStyles: { fillColor: grayLight },
-    styles: { fontSize: 10 },
-    margin: { left: 20, right: 20 }
-  });
+  // --------------------------------
+  // PAGE 4 CONTENT
+  // --------------------------------
+  function drawDTP() {
 
-  // ---------------------------------------
-  // ✅ QES – Tabelle
-  // ---------------------------------------
-  autoTable(pdf, {
-    startY: pdf.lastAutoTable.finalY + 10,
-    head: [["Beschreibung", "Preis (CHF)"]],
-    body: [
-      ["Qualifizierte elektronische Signatur (QES)", data.qes || "2.20"]
-    ],
-    headStyles: { fillColor: grayLight },
-    styles: { fontSize: 10 },
-    margin: { left: 20, right: 20 }
-  });
+    drawHeaderFooter(4);
 
+    pdf.setFont("helvetica","bold");
+    pdf.setFontSize(18);
+    pdf.text("Digital Trust Platform",20,25);
 
-  // ---------------------------------------
-  // ✅ Staffelpreise – seal.ID (neutral)
-  // ---------------------------------------
-  autoTable(pdf, {
-    startY: pdf.lastAutoTable.finalY + 15,
-    head: [["Volumen pro Jahr", "Preis (CHF)"]],
-    body: [
-      ["0 – 2’500", data.sealIdPrice || "28.20"],
-      ["2’501 – 5’000", "26.20"],
-      ["5’001 – 10’000", "24.20"],
-      ["> 10’000", "Nach Vereinbarung"]
-    ],
-    headStyles: { fillColor: grayLight },
-    styles: { fontSize: 10 },
-    margin: { left: 20, right: 20 }
-  });
-}
-  drawSigningPage(pdf, data);
-  pdf.addPage();
+    pdf.setFont("helvetica","normal");
+    pdf.setFontSize(11);
+    pdf.text(
+      "Die Digital Trust Platform ermöglicht eine sichere, skalierbare und vollständig digitale Kundeninteraktion.",
+      20,
+      35,
+      {maxWidth:170}
+    );
 
- // ----------------------------------------------------------
-// ✅ Seite 6 – Setup, Verschwiegenheit, Gültigkeit (neutral)
-// ----------------------------------------------------------
-function drawFinalPage(pdf, data) {
+    const cards = [
+      "Onboarding",
+      "Identifikation",
+      "Signing",
+      "Archivierung"
+    ];
 
-  const grayLight = [240, 240, 240];
-  const textColor = [0, 0, 0];
+    cards.forEach((c,i)=>{
+      const x = 20 + (i%2)*85;
+      const y = 60 + Math.floor(i/2)*40;
 
-  // -------------------------------
-  // ✅ 1. Kapitel: Setup-Gebühren
-  // -------------------------------
-  pdf.setFont("helvetica", "bold");
-  pdf.setFontSize(18);
-  pdf.setTextColor(...textColor);
-  pdf.text("3. Setup Gebühren", 20, 20);
+      pdf.setFillColor(...colors.light);
+      pdf.rect(x,y,80,30,"F");
 
-  autoTable(pdf, {
-    startY: 30,
-    head: [["Beschreibung", "Preis (CHF)"]],
-    body: [
-      ["Setup Fee (einmalig)", "5500.00"],
-      ["Ongoing Fee (jährlich)", "2500.00"],
-      ["SIGN pro Benutzer/Monat", (data.signUsers || 0) * 9],
-      ["White Labeling", data.whiteLabeling ? "2500.00" : "—"],
-    ],
-    headStyles: { fillColor: grayLight },
-    styles: { fontSize: 10 },
-    margin: { left: 20, right: 20 }
-  });
+      pdf.setFont("helvetica","bold");
+      pdf.text(c,x+5,y+10);
+    });
+  }
 
-  let nextY = pdf.lastAutoTable.finalY + 20;
+  // --------------------------------
+  // PAGE 5 PRICING
+  // --------------------------------
+  function drawPricing() {
 
-  // ----------------------------------------------
-  // ✅ 2. Kapitel: Verschwiegenheitsklausel (neutral)
-  // ----------------------------------------------
-  pdf.setFont("helvetica", "bold");
-  pdf.setFontSize(16);
-  pdf.text("4. Verschwiegenheitsklausel", 20, nextY);
+    drawHeaderFooter(5);
 
-  pdf.setFont("helvetica", "normal");
-  pdf.setFontSize(11);
+    pdf.setFont("helvetica","bold");
+    pdf.setFontSize(18);
+    pdf.text("Signing Optionen",20,25);
 
-  const confidentialityText =
-    "Dies ist ein neutraler Beispielabsatz für eine Verschwiegenheitsklausel. " +
-    "An dieser Stelle kannst du deine eigenen rechtlichen Hinweise oder " +
-    "vertraulichen Bestimmungen einfügen.";
+    const pricing = [
+      ["EES","0.80 CHF"],
+      ["FES","1.50 CHF"],
+      ["QES","2.20 CHF"]
+    ];
 
-  pdf.text(confidentialityText, 20, nextY + 12, {
-    maxWidth: 170,
-    lineHeightFactor: 1.4
-  });
+    pricing.forEach((p,i)=>{
+      const x = 20 + i*60;
 
-  // ----------------------------------------------
-  // ✅ 3. Kapitel: Gültigkeit des Angebots
-  // ----------------------------------------------
-  nextY += 45;
+      pdf.setFillColor(...colors.light);
+      pdf.rect(x,50,50,40,"F");
 
-  pdf.setFont("helvetica", "bold");
-  pdf.setFontSize(16);
-  pdf.text("5. Gültigkeit des Angebots", 20, nextY);
+      pdf.setFont("helvetica","bold");
+      pdf.text(p[0],x+5,65);
 
-  pdf.setFont("helvetica", "normal");
-  pdf.setFontSize(11);
+      pdf.setFont("helvetica","normal");
+      pdf.text(p[1],x+5,80);
+    });
+  }
 
-  const validityText = `Dieses Angebot ist gültig bis: ${data.validUntil || ""}`;
+  // --------------------------------
+  // PAGE 6 FINAL
+  // --------------------------------
+  function drawFinal() {
 
-  pdf.text(validityText, 20, nextY + 12);
+    drawHeaderFooter(6);
 
-  // ----------------------------------------------
-  // ✅ Footer (neutral)
-  // ----------------------------------------------
-  pdf.setFont("helvetica", "normal");
-  pdf.setFontSize(9);
-  pdf.setTextColor(120,120,120);
+    pdf.setFont("helvetica","bold");
+    pdf.setFontSize(18);
+    pdf.text("Preisübersicht",20,25);
 
-  pdf.text("Offerte – Digital Trust Platform", 20, 285);
-  pdf.text("intrum AG", 190, 285, { align: "right" });
-}
+    autoTable(pdf,{
+      startY:40,
+      head:[["Beschreibung","Preis"]],
+      body:[
+        ["Setup Fee","5500 CHF"],
+        ["Ongoing Fee","2500 CHF"],
+        ["White Labeling","2500 CHF"]
+      ],
+      headStyles:{fillColor:colors.light},
+      styles:{fontSize:10}
+    });
 
-  drawFinalPage(pdf, data);
+    pdf.text(
+      `Gültig bis: ${data.validUntil || ""}`,
+      20,
+      pdf.lastAutoTable.finalY + 20
+    );
+  }
+
+  // BUILD PDF
+  drawCover();
   pdf.addPage();
 
-  // ------------------------------------------
-  // ✅ EXPORT
-  // ------------------------------------------
+  drawCompany();
+  pdf.addPage();
+
+  drawTOC();
+  pdf.addPage();
+
+  drawDTP();
+  pdf.addPage();
+
+  drawPricing();
+  pdf.addPage();
+
+  drawFinal();
+
   pdf.save(`Offerte_${data.company || "Angebot"}.pdf`);
 }
