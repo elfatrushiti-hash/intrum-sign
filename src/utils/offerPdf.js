@@ -6,7 +6,7 @@ export function exportOfferPDF(data) {
 
   const margin = 20;
   const pageWidth = 210;
-  const contentWidth = pageWidth - (margin * 2);
+  const contentWidth = pageWidth - margin * 2;
 
   const colors = {
     darkViolet: [23, 4, 86],
@@ -133,7 +133,7 @@ export function exportOfferPDF(data) {
     drawHeaderFooter(3);
 
     pdf.setFont("helvetica","bold");
-    pdf.setFontSize(14);
+    pdf.setFontSize(12);
     pdf.setTextColor(...colors.textDark);
     pdf.text("Inhalt", margin, 25);
 
@@ -149,25 +149,23 @@ export function exportOfferPDF(data) {
 
     toc.forEach(row => {
       pdf.setFont("helvetica","normal");
-      pdf.setFontSize(12);
+      pdf.setFontSize(10.5);
       pdf.text(row.title, margin, y);
 
-      // gepunktete Linie beginnt nach Text bis zur Seitenzahl
       const textWidth = pdf.getTextWidth(row.title);
       const lineStart = margin + textWidth + 2;
       const lineEnd = pageWidth - margin - 10;
-      const dotCount = Math.floor((lineEnd - lineStart)/2);
-      let dots = "";
-      for(let i=0;i<dotCount;i++) dots += ".";
+      const dotsCount = Math.floor((lineEnd - lineStart) / pdf.getTextWidth("."));
+      let dots = ".".repeat(dotsCount);
       pdf.text(dots, lineStart, y);
 
       pdf.text(row.page, pageWidth - margin, y, {align:"right"});
-      y += 10;
+      y += 8;
     });
   }
 
   // ---------------------------------------
-  // Seite 4 – DTP Text + Grafik
+  // Seite 4 – DTP Text + Bulletpoints + Kacheln
   // ---------------------------------------
   function drawDTPPage() {
     drawHeaderFooter(4);
@@ -175,7 +173,7 @@ export function exportOfferPDF(data) {
     let y = 25;
 
     pdf.setFont("helvetica","bold");
-    pdf.setFontSize(18);
+    pdf.setFontSize(16);
     pdf.setTextColor(...colors.intrumViolet);
 
     const title =
@@ -183,13 +181,13 @@ export function exportOfferPDF(data) {
 
     const titleLines = pdf.splitTextToSize(title, contentWidth);
     pdf.text(titleLines, margin, y);
-    y += titleLines.length * 8 + 5;
+    y += titleLines.length * 7 + 4;
 
     pdf.setFont("helvetica","normal");
     pdf.setFontSize(11);
     pdf.setTextColor(...colors.textDark);
 
-    const paragraph =
+    const paragraph1 =
       "Die Digital Trust Platform (DTP) verbindet alle zentralen Elemente für ein durchgängig digitales und vertrauenswürdiges Onboarding in einer modular aufgebauten Lösung: von der Identifikation über Bonitäts- und Fraud-Prüfungen bis hin zur elektronischen Signatur – sicher, rechtskonform und effizient.";
 
     const paragraph2 =
@@ -203,15 +201,15 @@ export function exportOfferPDF(data) {
       { title:"Signing", text:"Elektronische Signatur mit Unterstützung aller drei Signaturstufen (EES, FES, QES), rechtssicher und benutzerfreundlich." }
     ];
 
-    pdf.text(pdf.splitTextToSize(paragraph, contentWidth), margin, y);
-    y += pdf.splitTextToSize(paragraph, contentWidth).length * 6 + 5;
+    pdf.text(pdf.splitTextToSize(paragraph1, contentWidth), margin, y);
+    y += pdf.splitTextToSize(paragraph1, contentWidth).length * 6 + 4;
 
     pdf.text(pdf.splitTextToSize(paragraph2, contentWidth), margin, y);
-    y += pdf.splitTextToSize(paragraph2, contentWidth).length * 6 + 10;
+    y += pdf.splitTextToSize(paragraph2, contentWidth).length * 6 + 8;
 
     pdf.setFont("helvetica","bold");
     pdf.text(paragraph3, margin, y);
-    y += 7;
+    y += 6;
 
     bulletPoints.forEach(b=>{
       pdf.setFont("helvetica","bold");
@@ -219,62 +217,50 @@ export function exportOfferPDF(data) {
       pdf.setFont("helvetica","normal");
       const textLines = pdf.splitTextToSize(b.text, contentWidth - 28);
       pdf.text(textLines, margin + 28, y);
-      y += textLines.length * 6 + 5;
+      y += textLines.length * 6 + 4;
     });
 
     // -------------------------------
-    // GRAFIK – KACHELN UNTEN
+    // Kacheln – getrennt, ohne REST API
     // -------------------------------
-    const startY = y + 10;
-    const colCount = 4;
-    const colWidth = contentWidth / colCount;
+    const startY = y + 8;
+    const colWidth = (contentWidth - 6) / 2; // 2 Kacheln nebeneinander
     const boxHeight = 8;
     const boxSpacing = 3;
 
-    // REST API Abstand
-    const apiY = startY + 40;
-
-    pdf.setFillColor(...colors.lightGray);
-    pdf.rect(margin, apiY, contentWidth, 9, "F");
-    pdf.setFont("helvetica","normal");
-    pdf.setTextColor(...colors.textDark);
-    pdf.text("REST API", margin + contentWidth/2, apiY + 6, {align:"center"});
-
     const columns = [
       { title:"Kunde", items:["Self-Onboarding","CRM","Interne Applikation","Externe Applikation"] },
-      { title:"IDENTIFICATION", items:["AutoIdent","VideoIdent","OnlineIdent","QES-Ident (seal.ID)","BankIdent (ab 2026)","E-ID (ab 2026)"] },
-      { title:"", items:[] },
-      { title:"", items:[] }
+      { title:"IDENTIFICATION", items:["AutoIdent","VideoIdent","OnlineIdent","QES-Ident (seal.ID)","BankIdent (ab 2026)","E-ID (ab 2026)"] }
     ];
 
     columns.forEach((col,index)=>{
-      const x = margin + (index * colWidth);
+      const x = margin + (index * (colWidth + 6));
       let yPos = startY;
 
-      if(col.title) pdf.setFillColor(...colors.grayBox);
-      pdf.rect(x-2,yPos-2,colWidth,60,"F");
+      // Leichter grauer Hintergrund für die Einheit
+      pdf.setFillColor(...colors.lightGray);
+      pdf.rect(x-2,yPos-2,colWidth+4,boxHeight*col.items.length + boxSpacing*(col.items.length-1) + 14,"F");
 
       pdf.setFont("helvetica","bold");
       pdf.setFontSize(11);
       pdf.setTextColor(...colors.textDark);
       pdf.text(col.title, x, yPos);
-
       yPos += 6;
 
       col.items.forEach(item=>{
         pdf.setFillColor(...colors.intrumViolet);
-        pdf.roundedRect(x,yPos,colWidth-3,boxHeight,1.2,1.2,"F");
+        pdf.roundedRect(x,yPos,colWidth,boxHeight,1,1,"F");
         pdf.setFont("helvetica","normal");
         pdf.setFontSize(8.5);
         pdf.setTextColor(...colors.textLight);
-        pdf.text(item,x+(colWidth-3)/2,yPos+5,{align:"center"});
+        pdf.text(item, x+colWidth/2, yPos+5, {align:"center"});
         yPos += boxHeight + boxSpacing;
       });
     });
   }
 
   // -------------------------------
-  // GENERIEREN
+  // PDF GENERIEREN
   // -------------------------------
   drawCover();
   pdf.addPage();
