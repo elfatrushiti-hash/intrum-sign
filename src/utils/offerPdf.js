@@ -15,9 +15,9 @@ export function exportOfferPDF(data) {
     border: [220,220,230]
   };
 
-  // ---------------------------
+  // ---------------------------------------
   // HEADER + FOOTER
-  // ---------------------------
+  // ---------------------------------------
   function drawHeaderFooter(page) {
     pdf.setFillColor(...colors.intrumViolet);
     pdf.rect(0, 0, 210, 6, "F");
@@ -34,9 +34,9 @@ export function exportOfferPDF(data) {
     pdf.text(`Seite ${page}`, 190, 287, {align:"right"});
   }
 
-  // ---------------------------
+  // ---------------------------------------
   // COVER PAGE
-  // ---------------------------
+  // ---------------------------------------
   function drawCover() {
     const steps = 100;
     for (let i=0; i<steps; i++) {
@@ -61,9 +61,9 @@ export function exportOfferPDF(data) {
     pdf.text("INTRUM", 105, 260, {align:"center"});
   }
 
-  // ---------------------------
+  // ---------------------------------------
   // SEITE 2 – UNTERNEHMENSDATEN
-  // ---------------------------
+  // ---------------------------------------
   function drawCompanyPage() {
     drawHeaderFooter(2);
 
@@ -73,30 +73,27 @@ export function exportOfferPDF(data) {
     pdf.setTextColor(...colors.intrumViolet);
     pdf.text("Offerte", 20, 20);
 
-    // Text darunter
+    // Text darunter mit Abstand
+    let y = 28;
     pdf.setFont("helvetica","normal");
     pdf.setFontSize(11);
     pdf.setTextColor(...colors.textDark);
-    
-    let y = 28;
-    
-    pdf.text("Ausgearbeitet von",20,28);
-    
+    pdf.text("Ausgearbeitet von",20,y);
+
     y += 6;
     pdf.setFont("helvetica","bold");
     pdf.text("Intrum AG, Eschenstrasse 12, 8603 Schwerzenbach",20,y);
 
+    y += 6;
     pdf.setFont("helvetica","normal");
-    pdf.text("(nachfolgend Intrum genannt)",20,40);
-    pdf.text("für",20,46);
+    pdf.text("(nachfolgend Intrum genannt)",20,y);
 
     y += 6;
-    pdf.setFont("helvetica","bold");
-    pdf.text("Firma (nachfolgend Partner genannt)",20,y);
+    pdf.text("für",20,y);
 
     // Block 1: Unternehmensdaten
     autoTable(pdf,{
-      startY: 55,
+      startY: y + 8,
       head:[["Angabe","Details"]],
       body:[
         ["Firmenname",data.company || "—"],
@@ -123,9 +120,9 @@ export function exportOfferPDF(data) {
     });
   }
 
-  // ---------------------------
+  // ---------------------------------------
   // PDF erzeugen
-  // ---------------------------
+  // ---------------------------------------
   drawCover();
   pdf.addPage();
   drawCompanyPage();
