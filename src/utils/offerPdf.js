@@ -83,23 +83,36 @@ function drawCoverPage(pdf) {
   drawCoverPage(pdf);
   pdf.addPage();
  
-// ---------------------------------------------
-// ✅ Seite 2 – Firmeninformationen (neutral)
-// ---------------------------------------------
+// ----------------------------------------------------------
+// ✅ Seite 2 – Firmeninformationen (optimiert & neutral)
+// ----------------------------------------------------------
 function drawCompanyPage(pdf, data) {
 
+  // Einheitliche Farbcodes
   const grayLight = [240, 240, 240];
   const textColor = [0, 0, 0];
 
-  // Titel der Seite
+  // Einheitliche Seitenränder
+  const marginLeft = 20;
+  const marginRight = 20;
+  const marginTop = 20;
+
+  // -------------------------------
+  // ✅ 1. Seitentitel
+  // -------------------------------
   pdf.setFont("helvetica", "bold");
   pdf.setFontSize(20);
   pdf.setTextColor(...textColor);
-  pdf.text("Firmeninformationen", 20, 20);
+  pdf.text("Firmeninformationen", marginLeft, marginTop);
 
-  // Firmen-Tabelle
+  // Abstand unter dem Titel
+  let startY = marginTop + 15; // statt fix → sauberer Abstand
+
+  // -------------------------------
+  // ✅ 2. Tabelle (mit schönem Abstand)
+  // -------------------------------
   autoTable(pdf, {
-    startY: 35,
+    startY: startY,
     head: [["Feld", "Wert"]],
     body: [
       ["Firmenname", data.company || ""],
@@ -113,10 +126,33 @@ function drawCompanyPage(pdf, data) {
       ["Telefon", data.contactPhone || ""],
       ["E-Mail", data.contactEmail || ""],
     ],
-    headStyles: { fillColor: grayLight },
-    styles: { font: "helvetica", fontSize: 10 },
-    margin: { left: 20, right: 20 }
+
+    // Tabellenoptik
+    headStyles: { 
+      fillColor: grayLight,
+      textColor: textColor,
+      fontStyle: "bold"
+    },
+    styles: { 
+      font: "helvetica", 
+      fontSize: 10, 
+      cellPadding: 3,          // ✅ optisch schöner
+      lineColor: [200,200,200],
+      lineWidth: 0.2
+    },
+    alternateRowStyles: {
+      fillColor: [250,250,250]  // ✅ leichte Zebraoptik (professioneller)
+    },
+
+    // Seitenränder
+    margin: { left: marginLeft, right: marginRight },
+
+    // Automatische Seitenhöhe falls nötig
+    pageBreak: "auto"
   });
+
+  // (Optional) Abstand zur nächsten Sektion, falls du später etwas einfügen willst
+  // let nextY = pdf.lastAutoTable.finalY + 15;
 }
   drawCompanyPage(pdf, data);
   pdf.addPage();
