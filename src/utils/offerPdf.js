@@ -30,12 +30,6 @@ export function exportOfferPDF(data) {
   // ✅ Seite 6
   drawFinalPage(pdf, data);
 
-  // Export
-  pdf.save("Offerte.pdf");
-
-
-
-
 function drawDottedLine(pdf, x, y, width) {
   const dotCount = Math.floor(width / 2); // Menge der Punkte, anpassen falls nötig
   const dots = " ".repeat(dotCount);
