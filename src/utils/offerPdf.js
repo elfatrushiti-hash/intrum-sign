@@ -50,6 +50,7 @@ function drawCoverPage(pdf) {
   pdf.text("intrum", 105, 265, { align: "center" });
 }
   drawCoverPage(pdf);
+  pdf.addPage();
   // ------------------------------------------
   // ✅ PAGE 2 – Company & Contact placeholders
   // ------------------------------------------
