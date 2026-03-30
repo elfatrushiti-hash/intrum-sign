@@ -14,9 +14,13 @@ export function exportOfferPDF(data) {
     intrumViolet: [120, 50, 180],
     textDark: [0,0,0],
     textLight: [255,255,255],
-    lightGray: [240,240,245]
+    lightGray: [240,240,245],
+    grayBox: [245,245,250]
   };
 
+  // ---------------------------------------
+  // Header/Footer
+  // ---------------------------------------
   function drawHeaderFooter(page) {
     pdf.setFillColor(...colors.intrumViolet);
     pdf.rect(0, 0, 210, 6, "F");
@@ -33,6 +37,9 @@ export function exportOfferPDF(data) {
     pdf.text(`Seite ${page}`, 190, 287, {align:"right"});
   }
 
+  // ---------------------------------------
+  // Cover Page
+  // ---------------------------------------
   function drawCover() {
     const steps = 100;
     for (let i=0; i<steps; i++) {
@@ -57,6 +64,9 @@ export function exportOfferPDF(data) {
     pdf.text("INTRUM", 105, 260, {align:"center"});
   }
 
+  // ---------------------------------------
+  // Seite 2 – Unternehmensdaten
+  // ---------------------------------------
   function drawCompanyPage() {
     drawHeaderFooter(2);
 
@@ -92,6 +102,7 @@ export function exportOfferPDF(data) {
       margin: { left: margin, right: margin },
       head:[["Angabe","Details"]],
       headStyles:{ fillColor: colors.intrumViolet, textColor:255 },
+      styles:{ fontSize:10.5, textColor: colors.textDark, lineColor: [220,220,230] },
       body:[
         ["Firmenname",data.company || "—"],
         ["UID",data.uid || "—"],
@@ -106,6 +117,7 @@ export function exportOfferPDF(data) {
       margin: { left: margin, right: margin },
       head:[["Ansprechperson","Details"]],
       headStyles:{ fillColor: colors.intrumViolet, textColor:255 },
+      styles:{ fontSize:10.5, textColor: colors.textDark, lineColor: [220,220,230] },
       body:[
         ["Name",data.contactName || "—"],
         ["Telefon",data.contactPhone || "—"],
@@ -114,11 +126,14 @@ export function exportOfferPDF(data) {
     });
   }
 
+  // ---------------------------------------
+  // Seite 3 – Inhaltsverzeichnis
+  // ---------------------------------------
   function drawTableOfContents() {
     drawHeaderFooter(3);
 
     pdf.setFont("helvetica","bold");
-    pdf.setFontSize(22);
+    pdf.setFontSize(14);
     pdf.setTextColor(...colors.textDark);
     pdf.text("Inhalt", margin, 25);
 
@@ -133,81 +148,27 @@ export function exportOfferPDF(data) {
     ];
 
     toc.forEach(row => {
+      pdf.setFont("helvetica","normal");
+      pdf.setFontSize(12);
       pdf.text(row.title, margin, y);
+
+      // gepunktete Linie beginnt **nach Text** bis zur Seitenzahl
+      const textWidth = pdf.getTextWidth(row.title);
+      const lineStart = margin + textWidth + 2;
+      const lineEnd = pageWidth - margin - 10;
+      const dotCount = Math.floor((lineEnd - lineStart)/2);
+      let dots = "";
+      for(let i=0;i<dotCount;i++) dots += ".";
+      pdf.text(dots, lineStart, y);
+
       pdf.text(row.page, pageWidth - margin, y, {align:"right"});
       y += 10;
     });
   }
 
-  function drawArchitecture(yStart){
-
-    const colCount = 4;
-    const colWidth = contentWidth / colCount;
-
-    const boxHeight = 8;
-    const boxSpacing = 3;
-
-    const columns = [
-      {
-        title:"Kunde",
-        items:[
-          "Self-Onboarding",
-          "CRM",
-          "Interne Applikation",
-          "Externe Applikation"
-        ]
-      },
-      {
-        title:"IDENTIFICATION",
-        items:[
-          "AutoIdent",
-          "VideoIdent",
-          "OnlineIdent",
-          "QES-Ident (seal.ID)",
-          "BankIdent (ab 2026)",
-          "E-ID (ab 2026)"
-        ]
-      },
-      { title:"", items:[] },
-      { title:"", items:[] }
-    ];
-
-    const apiY = yStart + 40;
-    pdf.setFillColor(...colors.lightGray);
-    pdf.rect(margin, apiY, contentWidth, 9, "F");
-
-    pdf.setFont("helvetica","bold");
-    pdf.setFontSize(10);
-    pdf.setTextColor(...colors.textDark);
-    pdf.text("REST API", margin + contentWidth/2, apiY + 6, {align:"center"});
-
-    columns.forEach((col,index)=>{
-      const x = margin + (index * colWidth);
-      let y = yStart;
-
-      pdf.setFont("helvetica","bold");
-      pdf.setFontSize(11);
-      pdf.setTextColor(...colors.textDark);
-      pdf.text(col.title, x, y);
-
-      y += 6;
-
-      col.items.forEach(item=>{
-
-        pdf.setFillColor(...colors.intrumViolet);
-        pdf.roundedRect(x,y,colWidth-3,boxHeight,1.2,1.2,"F");
-
-        pdf.setFont("helvetica","normal");
-        pdf.setFontSize(8.5);
-        pdf.setTextColor(...colors.textLight);
-
-        pdf.text(item,x+(colWidth-3)/2,y+5,{align:"center"});
-
-        y += boxHeight + boxSpacing;
-      });
-    });
-  }
-
+  // ---------------------------------------
+  // Seite 4 – DTP + Grafik
+  // ---------------------------------------
   function drawDTPPage() {
     drawHeaderFooter(4);
 
@@ -229,27 +190,92 @@ export function exportOfferPDF(data) {
     pdf.setTextColor(...colors.textDark);
 
     const paragraph =
-      "Die Digital Trust Platform (DTP) verbindet alle zentralen Elemente für ein durchgängig digitales und vertrauenswürdiges Onboarding in einer modular aufgebauten Lösung.";
+      "Die Digital Trust Platform (DTP) verbindet alle zentralen Elemente für ein durchgängig digitales und vertrauenswürdiges Onboarding in einer modular aufgebauten Lösung: von der Identifikation über Bonitäts- und Fraud-Prüfungen bis hin zur elektronischen Signatur – sicher, rechtskonform und effizient.";
 
-    const textLines = pdf.splitTextToSize(paragraph, contentWidth);
-    pdf.text(textLines, margin, y);
-    y += textLines.length * 6 + 10;
+    const paragraph2 =
+      "Die Plattform wurde speziell dafür entwickelt, Unternehmen bei der Digitalisierung kritischer Prozesse zu unterstützen, ohne dabei Kompromisse bei Sicherheit, Nutzerfreundlichkeit oder regulatorischer Konformität einzugehen. Sie lässt sich flexibel in bestehende Systemlandschaften integrieren und ermöglicht so individuelle Customer Journeys mit hohem Automatisierungsgrad.";
+
+    const paragraph3 =
+      "Kernmodule der DTP sind:";
+
+    const bulletPoints = [
+      { title:"Identification", text:"Verschiedene Verfahren wie AutoIdent, VideoIdent oder vor-Ort-Identifikation, je nach regulatorischen Anforderungen." },
+      { title:"Smart Data", text:"Intelligente Prüfungen wie Bonitätsbewertung (AI Credit Scores), Adressverifikation, Fraud Check und Compliance Screening – nahtlos eingebunden in den Onboarding-Prozess." },
+      { title:"Signing", text:"Elektronische Signatur mit Unterstützung aller drei Signaturstufen (EES, FES, QES), rechtssicher und benutzerfreundlich." }
+    ];
+
+    pdf.text(pdf.splitTextToSize(paragraph, contentWidth), margin, y);
+    y += pdf.splitTextToSize(paragraph, contentWidth).length * 6 + 5;
+
+    pdf.text(pdf.splitTextToSize(paragraph2, contentWidth), margin, y);
+    y += pdf.splitTextToSize(paragraph2, contentWidth).length * 6 + 10;
 
     pdf.setFont("helvetica","bold");
-    pdf.text("Kernmodule der DTP sind:", margin, y);
-    y += 8;
+    pdf.text(paragraph3, margin, y);
+    y += 7;
 
+    bulletPoints.forEach(b=>{
+      pdf.setFont("helvetica","bold");
+      pdf.text("• " + b.title + ":", margin, y);
+      pdf.setFont("helvetica","normal");
+      pdf.text(b.text, margin + 28, y);
+      y += 10;
+    });
+
+    // -------------------------------
+    // GRAFIK – KACHELN UNTEN
+    // -------------------------------
+    const startY = y + 10;
+    const colCount = 4;
+    const colWidth = contentWidth / colCount;
+    const boxHeight = 8;
+    const boxSpacing = 3;
+
+    // REST API Abstand
+    const apiY = startY + 40;
+    pdf.setFillColor(...colors.lightGray);
+    pdf.rect(margin, apiY, contentWidth, 9, "F");
     pdf.setFont("helvetica","normal");
-    pdf.text("Identification: ...", margin, y);
-    y += 6;
-    pdf.text("Smart Data: ...", margin, y);
-    y += 6;
-    pdf.text("Signing: ...", margin, y);
+    pdf.setTextColor(...colors.textDark);
+    pdf.text("REST API", margin + contentWidth/2, apiY + 6, {align:"center"});
 
-    /* GRAFIK UNTEN */
-    drawArchitecture(200);
+    const columns = [
+      { title:"Kunde", items:["Self-Onboarding","CRM","Interne Applikation","Externe Applikation"] },
+      { title:"IDENTIFICATION", items:["AutoIdent","VideoIdent","OnlineIdent","QES-Ident (seal.ID)","BankIdent (ab 2026)","E-ID (ab 2026)"] },
+      { title:"", items:[] },
+      { title:"", items:[] }
+    ];
+
+    columns.forEach((col,index)=>{
+      const x = margin + (index * colWidth);
+      let yPos = startY;
+
+      // leichter grauer Hintergrund für die Kachel
+      if(col.title) pdf.setFillColor(...colors.grayBox);
+      pdf.rect(x-2,yPos-2,colWidth,60,"F");
+
+      pdf.setFont("helvetica","bold");
+      pdf.setFontSize(11);
+      pdf.setTextColor(...colors.textDark);
+      pdf.text(col.title, x, yPos);
+
+      yPos += 6;
+
+      col.items.forEach(item=>{
+        pdf.setFillColor(...colors.intrumViolet);
+        pdf.roundedRect(x,yPos,colWidth-3,boxHeight,1.2,1.2,"F");
+        pdf.setFont("helvetica","normal");
+        pdf.setFontSize(8.5);
+        pdf.setTextColor(...colors.textLight);
+        pdf.text(item,x+(colWidth-3)/2,yPos+5,{align:"center"});
+        yPos += boxHeight + boxSpacing;
+      });
+    });
   }
 
+  // -------------------------------
+  // GENERIEREN
+  // -------------------------------
   drawCover();
   pdf.addPage();
   drawCompanyPage();
