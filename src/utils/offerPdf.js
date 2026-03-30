@@ -15,7 +15,6 @@ export function exportOfferPDF(data) {
   drawCoverPage(pdf);
 
   // ✅ Seite 2
-  pdf.addPage();
   drawCompanyPage(pdf, data);
 
 
@@ -99,6 +98,7 @@ function drawCompanyPage(pdf, data) {
     margin: { left: 20, right: 20 }
   });
 }
+  drawCompanyPage(pdf, data);
   pdf.addPage();
   // ------------------------------------------
   // ✅ PAGE 3 – Inhaltsverzeichnis (Neutral)
