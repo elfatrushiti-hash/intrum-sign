@@ -62,7 +62,6 @@ export function exportOfferPDF(data) {
   // COMPANY PAGE (Seite 2)
   // ---------------------------
   function drawCompany() {
-
     drawHeaderFooter(2);
 
     pdf.setFont("helvetica","bold");
@@ -97,10 +96,9 @@ export function exportOfferPDF(data) {
   }
 
   // ---------------------------
-  // PRODUCTS PAGE (Alle Produkte auf einer Seite)
+  // PRODUCTS PAGE (Seite 3)
   // ---------------------------
   function drawProducts() {
-
     drawHeaderFooter(3);
 
     pdf.setFont("helvetica","bold");
@@ -111,41 +109,47 @@ export function exportOfferPDF(data) {
     pdf.setFont("helvetica","normal");
     pdf.setFontSize(11);
     pdf.setTextColor(...colors.textDark);
-    pdf.text("Übersicht aller verfügbaren Module und Preise:",20,35);
+    pdf.text("Übersicht aller verfügbaren Module mit Preisen:",20,35);
 
+    // Module
     const modules = [
       { title:"Onboarding", desc:"Digitale Kundenaufnahme", price:data.onboarding || "—" },
       { title:"Identifikation", desc:"KYC & Verifizierung", price:data.identification || "—" },
-      { title:"Signing", desc:"Elektronische Signatur", price:data.signing || "—" },
+      { title:"Signing", desc:"Elektronische Signatur", price:`EES ${data.ees || "0.80"} CHF\nFES ${data.fes || "1.50"} CHF\nQES ${data.qes || "2.20"} CHF` },
       { title:"Archivierung", desc:"Sichere Dokumentenablage", price:data.archiving || "—" },
-      { title:"Seal.ID", desc:"Authentifizierung", price:data.sealId || "—" },
+      { title:"Seal.ID", desc:"Authentifizierung", price:`0–2’500: ${data.sealIdPrice || "28.20"} CHF\n2’501–5’000: 26.20 CHF\n5’001–10’000: 24.20 CHF\n>10’000: Nach Vereinbarung` },
       { title:"Reporting", desc:"Datenanalyse & Reports", price:data.reporting || "—" }
     ];
 
     const startX = 20;
     const startY = 50;
     const colWidth = 80;
-    const colHeight = 30;
+    const colHeight = 40;
     const gapX = 10;
     const gapY = 10;
     let x = startX;
     let y = startY;
 
     modules.forEach((m,i)=>{
+      // Card Background
       pdf.setFillColor(...colors.secondary);
       pdf.rect(x,y,colWidth,colHeight,"F");
 
+      // Title
       pdf.setFont("helvetica","bold");
       pdf.setFontSize(11);
       pdf.setTextColor(...colors.textLight);
       pdf.text(m.title,x+5,y+8);
 
+      // Description
       pdf.setFont("helvetica","normal");
       pdf.setFontSize(10);
       pdf.text(m.desc,x+5,y+16);
-      pdf.text(`Preis: ${m.price}`,x+5,y+24);
 
-      // Position für nächste Karte
+      // Price (multi-line)
+      pdf.text(m.price,x+5,y+24);
+
+      // Grid positioning
       if ((i+1)%2 === 0) {
         x = startX;
         y += colHeight + gapY;
@@ -156,10 +160,9 @@ export function exportOfferPDF(data) {
   }
 
   // ---------------------------
-  // FINAL SUMMARY PAGE
+  // FINAL SUMMARY PAGE (Seite 4)
   // ---------------------------
   function drawFinal() {
-
     drawHeaderFooter(4);
 
     pdf.setFont("helvetica","bold");
@@ -170,15 +173,9 @@ export function exportOfferPDF(data) {
     pdf.setFont("helvetica","normal");
     pdf.setFontSize(11);
     pdf.setTextColor(...colors.textDark);
-    pdf.text(
-      `Gültig bis: ${data.validUntil || "—"}`,
-      20, 40
-    );
 
-    pdf.text(
-      "Dieses Dokument stellt eine Übersicht aller Module und Preise dar. Alle Angaben ohne Gewähr.",
-      20, 50, { maxWidth:170, lineHeightFactor:1.4 }
-    );
+    pdf.text(`Gültig bis: ${data.validUntil || "—"}`,20,40);
+    pdf.text("Dieses Dokument stellt eine Übersicht aller Module und Preise dar. Alle Angaben ohne Gewähr.",20,50,{maxWidth:170,lineHeightFactor:1.4});
   }
 
   // ---------------------------
