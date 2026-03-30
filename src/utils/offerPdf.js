@@ -51,46 +51,54 @@ function drawCoverPage(pdf) {
 }
   drawCoverPage(pdf);
   pdf.addPage();
-  // ------------------------------------------
-  // ✅ PAGE 2 – Company & Contact placeholders
-  // ------------------------------------------
+ 
+// ---------------------------------------------
+// ✅ Seite 2 – Firmeninformationen (neutral)
+// ---------------------------------------------
+function drawCompanyPage(pdf, data) {
+
+  const grayLight = [240, 240, 240];
+  const textColor = [0, 0, 0];
+
+  // Titel der Seite
   pdf.setFont("helvetica", "bold");
   pdf.setFontSize(20);
-  pdf.setTextColor(23, 4, 86);
-  pdf.text("Offerte", 20, 20);
+  pdf.setTextColor(...textColor);
+  pdf.text("Firmeninformationen", 20, 20);
 
-  pdf.setFontSize(12);
-  pdf.setTextColor(0, 0, 0);
-  pdf.setFont("helvetica", "normal");
-  pdf.text("Ausgearbeitet von:", 20, 35);
-
-  pdf.text("[ANBIETER_NAME]", 20, 45);
-  pdf.text("[ANBIETER_ADRESSE]", 20, 52);
-
-  pdf.text("für:", 20, 67);
-
-  // Company Table
+  // Firmen-Tabelle
   autoTable(pdf, {
-    startY: 75,
+    startY: 35,
     head: [["Feld", "Wert"]],
     body: [
       ["Firmenname", data.company || ""],
       ["UID", data.uid || ""],
-      ["Handelsregister (Ja/Nein)", data.hrRegister || ""],
+      ["Handelsregister", data.hrRegister || ""],
       ["Strasse / Nr", data.street || ""],
       ["PLZ / Ort", `${data.postcode || ""} ${data.city || ""}`],
       ["Postfach", data.poBox || ""],
-      ["PLZ / Ort (Postfach)", data.poPostcode || ""],
+      ["PLZ/Ort (Postfach)", data.poPostcode || ""],
       ["Kontaktperson", data.contactName || ""],
-      ["Funktion / Abteilung", data.contactRole || ""],
       ["Telefon", data.contactPhone || ""],
       ["E-Mail", data.contactEmail || ""],
     ],
-    headStyles: { fillColor: [230, 230, 230] },
+    headStyles: { fillColor: grayLight },
     styles: { font: "helvetica", fontSize: 10 },
-    margin: { left: 20, right: 20 },
+    margin: { left: 20, right: 20 }
+  });
+}
+export function exportOfferPDF(data) {
+  const pdf = new jsPDF({
+    unit: "mm",
+    format: "a4"
   });
 
+  // ✅ Seite 1 (Deckblatt)
+  drawCoverPage(pdf);
+
+  // ✅ Seite 2
+  pdf.addPage();
+  drawCompanyPage(pdf, data);
   pdf.addPage();
 
   // ------------------------------------------
