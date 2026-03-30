@@ -92,15 +92,7 @@ export function exportOfferPDF(data) {
     unit: "mm",
     format: "a4"
   });
-
-  // ✅ Seite 1 (Deckblatt)
-  drawCoverPage(pdf);
-
-  // ✅ Seite 2
   pdf.addPage();
-  drawCompanyPage(pdf, data);
-  pdf.addPage();
-
   // ------------------------------------------
   // ✅ PAGE 3 – Inhaltsverzeichnis (Neutral)
   // ------------------------------------------
