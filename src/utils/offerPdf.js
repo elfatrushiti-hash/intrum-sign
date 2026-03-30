@@ -84,10 +84,12 @@ export function exportOfferPDF(data) {
 
     y += 10;
     pdf.setFont("helvetica","bold");
+    pdf.setTextColor(...colors.intrumViolet);
     pdf.text("Intrum AG, Eschenstrasse 12, 8603 Schwerzenbach",margin,y);
 
     y += 6;
     pdf.setFont("helvetica","normal");
+    pdf.setTextColor(...colors.textDark);
     pdf.text("(nachfolgend Intrum genannt)",margin,y);
 
     y += 10;
@@ -153,6 +155,7 @@ export function exportOfferPDF(data) {
     toc.forEach(row=>{
       pdf.setFont("helvetica","normal");
       pdf.setFontSize(10.5);
+      pdf.setTextColor(...colors.textDark);
       pdf.text(row.title, margin, y);
 
       const textWidth = pdf.getTextWidth(row.title) + 2;
@@ -168,41 +171,30 @@ export function exportOfferPDF(data) {
   }
 
   // -------------------------------
-  // Seite 4 – DTP Text + Bulletpoints + 4 Kacheln
+  // Seite 4 – DTP Text + Bulletpoints + 4 getrennte Kacheln
   // -------------------------------
   function drawDTPPage() {
     drawHeaderFooter(4);
 
     let y = 25;
 
+    // Titel
     pdf.setFont("helvetica","bold");
     pdf.setFontSize(16);
     pdf.setTextColor(...colors.intrumViolet);
-
-    const title =
-      "1  Digital Trust Platform – Die Grundlage für sichere und effiziente digitale Geschäftsprozesse";
-
+    const title = "1  Digital Trust Platform – Die Grundlage für sichere und effiziente digitale Geschäftsprozesse";
     const titleLines = pdf.splitTextToSize(title, contentWidth);
     pdf.text(titleLines, margin, y);
     y += titleLines.length * 7 + 4;
 
+    // Textabsätze
     pdf.setFont("helvetica","normal");
     pdf.setFontSize(11);
     pdf.setTextColor(...colors.textDark);
 
-    const paragraph1 =
-      "Die Digital Trust Platform (DTP) verbindet alle zentralen Elemente für ein durchgängig digitales und vertrauenswürdiges Onboarding in einer modular aufgebauten Lösung: von der Identifikation über Bonitäts- und Fraud-Prüfungen bis hin zur elektronischen Signatur – sicher, rechtskonform und effizient.";
-
-    const paragraph2 =
-      "Die Plattform wurde speziell dafür entwickelt, Unternehmen bei der Digitalisierung kritischer Prozesse zu unterstützen, ohne dabei Kompromisse bei Sicherheit, Nutzerfreundlichkeit oder regulatorischer Konformität einzugehen. Sie lässt sich flexibel in bestehende Systemlandschaften integrieren und ermöglicht so individuelle Customer Journeys mit hohem Automatisierungsgrad.";
-
+    const paragraph1 = "Die Digital Trust Platform (DTP) verbindet alle zentralen Elemente für ein durchgängig digitales und vertrauenswürdiges Onboarding in einer modular aufgebauten Lösung: von der Identifikation über Bonitäts- und Fraud-Prüfungen bis hin zur elektronischen Signatur – sicher, rechtskonform und effizient.";
+    const paragraph2 = "Die Plattform wurde speziell dafür entwickelt, Unternehmen bei der Digitalisierung kritischer Prozesse zu unterstützen, ohne dabei Kompromisse bei Sicherheit, Nutzerfreundlichkeit oder regulatorischer Konformität einzugehen. Sie lässt sich flexibel in bestehende Systemlandschaften integrieren und ermöglicht so individuelle Customer Journeys mit hohem Automatisierungsgrad.";
     const paragraph3 = "Kernmodule der DTP sind:";
-
-    const bulletPoints = [
-      { title:"Identification", text:"Verschiedene Verfahren wie AutoIdent, VideoIdent oder vor-Ort-Identifikation, je nach regulatorischen Anforderungen." },
-      { title:"Smart Data", text:"Intelligente Prüfungen wie Bonitätsbewertung (AI Credit Scores), Adressverifikation, Fraud Check und Compliance Screening – nahtlos eingebunden in den Onboarding-Prozess." },
-      { title:"Signing", text:"Elektronische Signatur mit Unterstützung aller drei Signaturstufen (EES, FES, QES), rechtssicher und benutzerfreundlich." }
-    ];
 
     pdf.text(pdf.splitTextToSize(paragraph1, contentWidth), margin, y);
     y += pdf.splitTextToSize(paragraph1, contentWidth).length * 6 + 4;
@@ -214,6 +206,12 @@ export function exportOfferPDF(data) {
     pdf.text(paragraph3, margin, y);
     y += 6;
 
+    const bulletPoints = [
+      { title:"Identification", text:"Verschiedene Verfahren wie AutoIdent, VideoIdent oder vor-Ort-Identifikation, je nach regulatorischen Anforderungen." },
+      { title:"Smart Data", text:"Intelligente Prüfungen wie Bonitätsbewertung (AI Credit Scores), Adressverifikation, Fraud Check und Compliance Screening – nahtlos eingebunden in den Onboarding-Prozess." },
+      { title:"Signing", text:"Elektronische Signatur mit Unterstützung aller drei Signaturstufen (EES, FES, QES), rechtssicher und benutzerfreundlich." }
+    ];
+
     bulletPoints.forEach(b=>{
       pdf.setFont("helvetica","bold");
       pdf.text("• " + b.title + ":", margin, y);
@@ -224,7 +222,7 @@ export function exportOfferPDF(data) {
     });
 
     // -------------------------------
-    // Kacheln – 4 Einheiten
+    // 4 Getrennte Kacheln
     // -------------------------------
     const startY = y + 8;
     const colWidth = (contentWidth - 9) / 4;
@@ -242,6 +240,7 @@ export function exportOfferPDF(data) {
       const x = margin + (index * (colWidth + 3));
       let yPos = startY;
 
+      // Hintergrund Kachel
       pdf.setFillColor(...colors.lightGray);
       pdf.rect(x-2,yPos-2,colWidth+4,boxHeight*col.items.length + boxSpacing*(col.items.length-1) + 14,"F");
 
