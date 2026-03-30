@@ -152,7 +152,7 @@ export function exportOfferPDF(data) {
       pdf.setFontSize(12);
       pdf.text(row.title, margin, y);
 
-      // gepunktete Linie beginnt **nach Text** bis zur Seitenzahl
+      // gepunktete Linie beginnt nach Text bis zur Seitenzahl
       const textWidth = pdf.getTextWidth(row.title);
       const lineStart = margin + textWidth + 2;
       const lineEnd = pageWidth - margin - 10;
@@ -167,7 +167,7 @@ export function exportOfferPDF(data) {
   }
 
   // ---------------------------------------
-  // Seite 4 – DTP + Grafik
+  // Seite 4 – DTP Text + Grafik
   // ---------------------------------------
   function drawDTPPage() {
     drawHeaderFooter(4);
@@ -195,8 +195,7 @@ export function exportOfferPDF(data) {
     const paragraph2 =
       "Die Plattform wurde speziell dafür entwickelt, Unternehmen bei der Digitalisierung kritischer Prozesse zu unterstützen, ohne dabei Kompromisse bei Sicherheit, Nutzerfreundlichkeit oder regulatorischer Konformität einzugehen. Sie lässt sich flexibel in bestehende Systemlandschaften integrieren und ermöglicht so individuelle Customer Journeys mit hohem Automatisierungsgrad.";
 
-    const paragraph3 =
-      "Kernmodule der DTP sind:";
+    const paragraph3 = "Kernmodule der DTP sind:";
 
     const bulletPoints = [
       { title:"Identification", text:"Verschiedene Verfahren wie AutoIdent, VideoIdent oder vor-Ort-Identifikation, je nach regulatorischen Anforderungen." },
@@ -218,8 +217,9 @@ export function exportOfferPDF(data) {
       pdf.setFont("helvetica","bold");
       pdf.text("• " + b.title + ":", margin, y);
       pdf.setFont("helvetica","normal");
-      pdf.text(b.text, margin + 28, y);
-      y += 10;
+      const textLines = pdf.splitTextToSize(b.text, contentWidth - 28);
+      pdf.text(textLines, margin + 28, y);
+      y += textLines.length * 6 + 5;
     });
 
     // -------------------------------
@@ -233,6 +233,7 @@ export function exportOfferPDF(data) {
 
     // REST API Abstand
     const apiY = startY + 40;
+
     pdf.setFillColor(...colors.lightGray);
     pdf.rect(margin, apiY, contentWidth, 9, "F");
     pdf.setFont("helvetica","normal");
@@ -250,7 +251,6 @@ export function exportOfferPDF(data) {
       const x = margin + (index * colWidth);
       let yPos = startY;
 
-      // leichter grauer Hintergrund für die Kachel
       if(col.title) pdf.setFillColor(...colors.grayBox);
       pdf.rect(x-2,yPos-2,colWidth,60,"F");
 
