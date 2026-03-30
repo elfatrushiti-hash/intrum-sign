@@ -84,78 +84,102 @@ function drawCoverPage(pdf) {
   pdf.addPage();
  
 // ----------------------------------------------------------
-// ✅ Seite 2 – Firmeninformationen (optimiert & neutral)
+// ✅ Seite 2 – Modernisierte Firmeninformationen (neutral)
 // ----------------------------------------------------------
 function drawCompanyPage(pdf, data) {
 
-  // Einheitliche Farbcodes
-  const grayLight = [240, 240, 240];
-  const textColor = [0, 0, 0];
+  // Farben & Typo
+  const grayLight = [245, 245, 245];
+  const grayBorder = [210, 210, 210];
+  const grayText = [70, 70, 70];
+  const titleColor = [23, 4, 86]; // Purple Accent
 
-  // Einheitliche Seitenränder
+  // Page Margins
   const marginLeft = 20;
-  const marginRight = 20;
-  const marginTop = 20;
+  const marginTop = 22;
 
-  // -------------------------------
-  // ✅ 1. Seitentitel
-  // -------------------------------
+  // ----------------------------------------------------------
+  // ✅ 1. Modernes Seiten-Header-Label
+  // ----------------------------------------------------------
+  pdf.setFillColor(...titleColor);
+  pdf.rect(marginLeft, marginTop - 10, 170, 8, "F");
+
   pdf.setFont("helvetica", "bold");
-  pdf.setFontSize(20);
-  pdf.setTextColor(...textColor);
-  pdf.text("Firmeninformationen", marginLeft, marginTop);
+  pdf.setFontSize(13);
+  pdf.setTextColor(255, 255, 255);
+  pdf.text("Firmeninformationen", marginLeft + 3, marginTop - 4);
 
-  // Abstand unter dem Titel
-  let startY = marginTop + 15; // statt fix → sauberer Abstand
+  // ----------------------------------------------------------
+  // ✅ 2. Untertitel / Lead‑Text (modern, grauer Ton)
+  // ----------------------------------------------------------
+  pdf.setFont("helvetica", "normal");
+  pdf.setFontSize(10.5);
+  pdf.setTextColor(...grayText);
+  pdf.text(
+    "Übersicht der relevanten Firmen- und Kontaktangaben.",
+    marginLeft,
+    marginTop + 8
+  );
 
-  // -------------------------------
-  // ✅ 2. Tabelle (mit schönem Abstand)
-  // -------------------------------
+  // Spacing zur Tabelle
+  let startY = marginTop + 16;
+
+  // ----------------------------------------------------------
+  // ✅ 3. Moderne Tabelle (mit cleanem UI, leichter Schattierung)
+  // ----------------------------------------------------------
   autoTable(pdf, {
     startY: startY,
-    head: [["Feld", "Wert"]],
+    head: [["Angabe", "Wert"]],
     body: [
-      ["Firmenname", data.company || ""],
-      ["UID", data.uid || ""],
-      ["Handelsregister", data.hrRegister || ""],
-      ["Strasse / Nr", data.street || ""],
-      ["PLZ / Ort", `${data.postcode || ""} ${data.city || ""}`],
-      ["Postfach", data.poBox || ""],
-      ["PLZ/Ort (Postfach)", data.poPostcode || ""],
-      ["Kontaktperson", data.contactName || ""],
-      ["Telefon", data.contactPhone || ""],
-      ["E-Mail", data.contactEmail || ""],
+      ["Firmenname", data.company || "—"],
+      ["UID", data.uid || "—"],
+      ["Handelsregister (Ja/Nein)", data.hrRegister || "—"],
+      ["Strasse / Nr", data.street || "—"],
+      ["PLZ / Ort", `${data.postcode || ""} ${data.city || ""}` || "—"],
+      ["Postfach", data.poBox || "—"],
+      ["PLZ/Ort (Postfach)", data.poPostcode || "—"],
+      ["Kontaktperson", data.contactName || "—"],
+      ["Telefon", data.contactPhone || "—"],
+      ["E-Mail", data.contactEmail || "—"],
     ],
 
-    // Tabellenoptik
-    headStyles: { 
+    styles: {
+      font: "helvetica",
+      fontSize: 10.5,
+      cellPadding: 4.5,
+      textColor: grayText,
+      lineWidth: 0.2,
+      lineColor: grayBorder
+    },
+
+    headStyles: {
       fillColor: grayLight,
-      textColor: textColor,
-      fontStyle: "bold"
+      textColor: [40, 40, 40],
+      fontStyle: "bold",
+      lineWidth: 0
     },
-    styles: { 
-      font: "helvetica", 
-      fontSize: 10, 
-      cellPadding: 3,          // ✅ optisch schöner
-      lineColor: [200,200,200],
-      lineWidth: 0.2
-    },
+
     alternateRowStyles: {
-      fillColor: [250,250,250]  // ✅ leichte Zebraoptik (professioneller)
+      fillColor: [250, 250, 250]
     },
 
-    // Seitenränder
-    margin: { left: marginLeft, right: marginRight },
-
-    // Automatische Seitenhöhe falls nötig
-    pageBreak: "auto"
+    margin: { left: marginLeft, right: marginLeft },
+    tableWidth: 170,
   });
 
-  // (Optional) Abstand zur nächsten Sektion, falls du später etwas einfügen willst
-  // let nextY = pdf.lastAutoTable.finalY + 15;
+  // ----------------------------------------------------------
+  // ✅ 4. Optional: dezente Section‑Trennlinie (modern)
+  // ----------------------------------------------------------
+  let nextY = pdf.lastAutoTable.finalY + 12;
+  pdf.setDrawColor(...grayBorder);
+  pdf.setLineWidth(0.4);
+  pdf.line(marginLeft, nextY, marginLeft + 170, nextY);
+
+  // Bereit für weitere Abschnitte
 }
   drawCompanyPage(pdf, data);
   pdf.addPage();
+  
   // ----------------------------------------------------------
 // ✅ Seite 3 – Inhaltsverzeichnis (neutral & funktionsfähig)
 // ----------------------------------------------------------
