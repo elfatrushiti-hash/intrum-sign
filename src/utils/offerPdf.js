@@ -74,7 +74,7 @@ export function exportOfferPDF(data) {
     pdf.text("Offerte", 20, 30);
 
     // Text darunter mit Abstand
-    let y = 35;
+    let y = 55;
     pdf.setFont("helvetica","normal");
     pdf.setFontSize(11);
     pdf.setTextColor(...colors.textDark);
