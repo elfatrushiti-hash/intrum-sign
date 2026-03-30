@@ -49,21 +49,7 @@ function drawCoverPage(pdf) {
   pdf.setFontSize(32);
   pdf.text("intrum", 105, 265, { align: "center" });
 }
-
-// ---------------------------------------------
-// ✅ Hauptfunktion
-// ---------------------------------------------
-export function exportOfferPDF(data) {
-  const pdf = new jsPDF({
-    unit: "mm",
-    format: "a4"
-  });
-
-  // Seite 1
   drawCoverPage(pdf);
-
-  // Seite 2 usw.
-  pdf.addPage();
   // ------------------------------------------
   // ✅ PAGE 2 – Company & Contact placeholders
   // ------------------------------------------
