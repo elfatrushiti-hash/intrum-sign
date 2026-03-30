@@ -10,7 +10,6 @@ export function exportOfferPDF(data) {
 
   const colors = {
     darkViolet: [23, 4, 86],
-    midViolet: [120, 50, 180],
     lightViolet: [180, 120, 220],
     intrumViolet: [120, 50, 180],
     textDark: [0,0,0],
@@ -19,9 +18,7 @@ export function exportOfferPDF(data) {
     border: [220,220,230]
   };
 
-  // ---------------------------------------
-  // HEADER + FOOTER
-  // ---------------------------------------
+  // HEADER FOOTER
   function drawHeaderFooter(page) {
     pdf.setFillColor(...colors.intrumViolet);
     pdf.rect(0, 0, 210, 6, "F");
@@ -38,9 +35,7 @@ export function exportOfferPDF(data) {
     pdf.text(`Seite ${page}`, 190, 287, {align:"right"});
   }
 
-  // ---------------------------------------
   // COVER
-  // ---------------------------------------
   function drawCover() {
     const steps = 100;
     for (let i=0; i<steps; i++) {
@@ -65,9 +60,7 @@ export function exportOfferPDF(data) {
     pdf.text("INTRUM", 105, 260, {align:"center"});
   }
 
-  // ---------------------------------------
   // SEITE 2
-  // ---------------------------------------
   function drawCompanyPage() {
     drawHeaderFooter(2);
 
@@ -80,6 +73,7 @@ export function exportOfferPDF(data) {
 
     pdf.setFont("helvetica","normal");
     pdf.setFontSize(11);
+    pdf.setTextColor(...colors.textDark);
     pdf.text("Ausgearbeitet von",margin,y);
 
     y += 10;
@@ -101,6 +95,10 @@ export function exportOfferPDF(data) {
       startY: y + 8,
       margin: { left: margin, right: margin },
       head:[["Angabe","Details"]],
+      headStyles:{
+        fillColor: colors.intrumViolet,
+        textColor: 255
+      },
       body:[
         ["Firmenname",data.company || "—"],
         ["UID",data.uid || "—"],
@@ -114,6 +112,10 @@ export function exportOfferPDF(data) {
       startY: pdf.lastAutoTable.finalY + 15,
       margin: { left: margin, right: margin },
       head:[["Ansprechperson","Details"]],
+      headStyles:{
+        fillColor: colors.intrumViolet,
+        textColor: 255
+      },
       body:[
         ["Name",data.contactName || "—"],
         ["Telefon",data.contactPhone || "—"],
@@ -122,15 +124,13 @@ export function exportOfferPDF(data) {
     });
   }
 
-  // ---------------------------------------
   // SEITE 3
-  // ---------------------------------------
   function drawTableOfContents() {
     drawHeaderFooter(3);
 
     pdf.setFont("helvetica","bold");
     pdf.setFontSize(22);
-    pdf.setTextColor(...colors.intrumViolet);
+    pdf.setTextColor(...colors.textDark);
     pdf.text("Inhalt", margin, 25);
 
     let y = 40;
@@ -154,6 +154,10 @@ export function exportOfferPDF(data) {
     }
 
     toc.forEach(row => {
+      pdf.setFont("helvetica","normal");
+      pdf.setFontSize(12);
+      pdf.setTextColor(...colors.textDark);
+
       pdf.text(row.title, margin, y);
       dottedLine(row.title, y);
       pdf.text(row.page, pageWidth - margin, y, {align:"right"});
@@ -161,9 +165,7 @@ export function exportOfferPDF(data) {
     });
   }
 
-  // ---------------------------------------
   // SEITE 4
-  // ---------------------------------------
   function drawDTPPage() {
     drawHeaderFooter(4);
 
@@ -185,9 +187,7 @@ export function exportOfferPDF(data) {
     pdf.setTextColor(...colors.textDark);
 
     const paragraph =
-      "Die Digital Trust Platform (DTP) verbindet alle zentralen Elemente für ein durchgängig digitales und vertrauenswürdiges Onboarding in einer modular aufgebauten Lösung: von der Identifikation über Bonitäts- und Fraud-Prüfungen bis hin zur elektronischen Signatur – sicher, rechtskonform und effizient. " +
-      "Die Plattform wurde speziell dafür entwickelt, Unternehmen bei der Digitalisierung kritischer Prozesse zu unterstützen, ohne dabei Kompromisse bei Sicherheit, Nutzerfreundlichkeit oder regulatorischer Konformität einzugehen. " +
-      "Sie lässt sich flexibel in bestehende Systemlandschaften integrieren und ermöglicht so individuelle Customer Journeys mit hohem Automatisierungsgrad.";
+      "Die Digital Trust Platform (DTP) verbindet alle zentralen Elemente für ein durchgängig digitales und vertrauenswürdiges Onboarding in einer modular aufgebauten Lösung: von der Identifikation über Bonitäts- und Fraud-Prüfungen bis hin zur elektronischen Signatur – sicher, rechtskonform und effizient. Die Plattform wurde speziell dafür entwickelt, Unternehmen bei der Digitalisierung kritischer Prozesse zu unterstützen, ohne dabei Kompromisse bei Sicherheit, Nutzerfreundlichkeit oder regulatorischer Konformität einzugehen. Sie lässt sich flexibel in bestehende Systemlandschaften integrieren und ermöglicht so individuelle Customer Journeys mit hohem Automatisierungsgrad.";
 
     const textLines = pdf.splitTextToSize(paragraph, contentWidth);
     pdf.text(textLines, margin, y);
@@ -197,41 +197,26 @@ export function exportOfferPDF(data) {
     pdf.text("Kernmodule der DTP sind:", margin, y);
     y += 10;
 
-    const bulletIndent = margin + 5;
-    const textIndent = margin + 25;
-    const bulletWidth = pageWidth - textIndent - margin;
+    const bulletX = margin + 5;
+    const textStart = margin + 45;
+    const textWidth = pageWidth - textStart - margin;
 
     const bullets = [
-      {
-        title:"Identification:",
-        text:"Verschiedene Verfahren wie AutoIdent, VideoIdent oder vor-Ort-Identifikation, je nach regulatorischen Anforderungen."
-      },
-      {
-        title:"Smart Data:",
-        text:"Intelligente Prüfungen wie Bonitätsbewertung (AI Credit Scores), Adressverifikation, Fraud Check und Compliance Screening – nahtlos eingebunden in den Onboarding-Prozess."
-      },
-      {
-        title:"Signing:",
-        text:"Elektronische Signatur mit Unterstützung aller drei Signaturstufen (EES, FES, QES), rechtssicher und benutzerfreundlich."
-      }
+      ["Identification:", "Verschiedene Verfahren wie AutoIdent, VideoIdent oder vor-Ort-Identifikation, je nach regulatorischen Anforderungen."],
+      ["Smart Data:", "Intelligente Prüfungen wie Bonitätsbewertung (AI Credit Scores), Adressverifikation, Fraud Check und Compliance Screening – nahtlos eingebunden in den Onboarding-Prozess."],
+      ["Signing:", "Elektronische Signatur mit Unterstützung aller drei Signaturstufen (EES, FES, QES), rechtssicher und benutzerfreundlich."]
     ];
 
     bullets.forEach(b => {
 
-      pdf.circle(bulletIndent - 3, y-2, 1, "F");
+      pdf.circle(bulletX - 3, y-2, 1, "F");
 
       pdf.setFont("helvetica","bold");
-      pdf.text(b.title, bulletIndent, y);
-
-      const titleWidth = pdf.getTextWidth(b.title);
+      pdf.text(b[0], bulletX, y);
 
       pdf.setFont("helvetica","normal");
-      const lines = pdf.splitTextToSize(
-        b.text,
-        bulletWidth - titleWidth
-      );
-
-      pdf.text(lines, bulletIndent + titleWidth + 2, y);
+      const lines = pdf.splitTextToSize(b[1], textWidth);
+      pdf.text(lines, textStart, y);
 
       y += lines.length * 6 + 6;
     });
