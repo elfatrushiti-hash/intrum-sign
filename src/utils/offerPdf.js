@@ -20,6 +20,10 @@ export function exportOfferPDF(data) {
   // ✅ Seite 3
   drawTableOfContents(pdf);
 
+  // ✅ Seite 4
+  drawDTPPage(pdf);
+
+
 function drawDottedLine(pdf, x, y, width) {
   const dotCount = Math.floor(width / 2); // Menge der Punkte, anpassen falls nötig
   const dots = " ".repeat(dotCount);
@@ -156,28 +160,145 @@ function drawTableOfContents(pdf) {
   drawTableOfContents(pdf);
   pdf.addPage();
 
-  // ------------------------------------------
-  // ✅ PAGE 4 – Kapitel 1 (Neutral)
-  // ------------------------------------------
+ // ----------------------------------------------------------
+// ✅ Seite 4 – "Digital Trust Platform" (neutral)
+// ----------------------------------------------------------
+function drawDTPPage(pdf) {
+  const purpleDark = [23, 4, 86];
+  const purpleLight = [140, 70, 200];
+  const grayText = [60, 60, 60];
+
+  // ----------------------------------------------------------
+  // ✅ SEITEN-ÜBERSCHRIFT
+  // ----------------------------------------------------------
   pdf.setFont("helvetica", "bold");
-  pdf.setFontSize(16);
+  pdf.setFontSize(18);
+  pdf.setTextColor(...purpleDark);
   pdf.text("1. Digital Trust Platform – Überblick", 20, 20);
+
+  // ----------------------------------------------------------
+  // ✅ EINLEITENDER ABSATZ (neutraler Beispieltext)
+  //    → DU ersetzt ihn später durch deinen echten Abschnitt
+  // ----------------------------------------------------------
+  const paragraph = 
+    "Dies ist ein neutraler Platzhaltertext für die Beschreibung " +
+    "einer digitalen Vertrauensplattform. Du kannst hier jede Beschreibung " +
+    "einfügen, die du für dein Offerte-Dokument benötigst. Dieser Absatz " +
+    "soll lediglich demonstrieren, wie Fließtext auf Seite 4 dargestellt wird. ";
 
   pdf.setFont("helvetica", "normal");
   pdf.setFontSize(11);
+  pdf.setTextColor(...grayText);
 
-  const kap1 =
-    "Dieser Abschnitt beschreibt die Digital Trust Platform (DTP) als neutrale Übersicht.\n" +
-    "Hier können Sie eigene erläuternde Texte einfügen, die aus Ihrem Offerte-Formular stammen.\n\n" +
-    "Kernmodule (Beispiele):\n" +
-    "• Identification\n" +
-    "• Smart Data\n" +
-    "• Signing (EES, FES, QES)\n\n";
+  pdf.text(paragraph, 20, 35, { maxWidth: 170, lineHeightFactor: 1.4 });
 
-  pdf.text(kap1, 20, 35, { maxWidth: 170, lineHeightFactor: 1.4 });
+  // ----------------------------------------------------------
+  // ✅ BULLET-POINT LISTE (neutral)
+  // ----------------------------------------------------------
+  const bulletPoints = [
+    "Modulbereich A – Beispielinhalt.",
+    "Modulbereich B – Beispielinhalt.",
+    "Modulbereich C – Beispielinhalt."
+  ];
 
+  let bulletY = 70;
+
+  bulletPoints.forEach(point => {
+    pdf.circle(25, bulletY - 2, 1.5, "F");   // Bullet-Kreis
+    pdf.text(point, 30, bulletY);
+    bulletY += 8;
+  });
+
+  // ----------------------------------------------------------
+// ✅ Seite 4 – "Digital Trust Platform" (neutral)
+// ----------------------------------------------------------
+function drawDTPPage(pdf) {
+  const purpleDark = [23, 4, 86];
+  const purpleLight = [140, 70, 200];
+  const grayText = [60, 60, 60];
+
+  // ----------------------------------------------------------
+  // ✅ SEITEN-ÜBERSCHRIFT
+  // ----------------------------------------------------------
+  pdf.setFont("helvetica", "bold");
+  pdf.setFontSize(18);
+  pdf.setTextColor(...purpleDark);
+  pdf.text("1. Digital Trust Platform – Überblick", 20, 20);
+
+  // ----------------------------------------------------------
+  // ✅ EINLEITENDER ABSATZ (neutraler Beispieltext)
+  //    → DU ersetzt ihn später durch deinen echten Abschnitt
+  // ----------------------------------------------------------
+  const paragraph = 
+    "Dies ist ein neutraler Platzhaltertext für die Beschreibung " +
+    "einer digitalen Vertrauensplattform. Du kannst hier jede Beschreibung " +
+    "einfügen, die du für dein Offerte-Dokument benötigst. Dieser Absatz " +
+    "soll lediglich demonstrieren, wie Fließtext auf Seite 4 dargestellt wird. ";
+
+  pdf.setFont("helvetica", "normal");
+  pdf.setFontSize(11);
+  pdf.setTextColor(...grayText);
+
+  pdf.text(paragraph, 20, 35, { maxWidth: 170, lineHeightFactor: 1.4 });
+
+  // ----------------------------------------------------------
+  // ✅ BULLET-POINT LISTE (neutral)
+  // ----------------------------------------------------------
+  const bulletPoints = [
+    "Modulbereich A – Beispielinhalt.",
+    "Modulbereich B – Beispielinhalt.",
+    "Modulbereich C – Beispielinhalt."
+  ];
+
+  let bulletY = 70;
+
+  bulletPoints.forEach(point => {
+    pdf.circle(25, bulletY - 2, 1.5, "F");   // Bullet-Kreis
+    pdf.text(point, 30, bulletY);
+    bulletY += 8;
+  });
+
+  // ----------------------------------------------------------
+  // ✅ 4-SPALTEN-MODULGRAFIK (neutral)
+  // ----------------------------------------------------------
+  const columns = [
+    { title: "MODUL A", fields: ["Funktion 1", "Funktion 2", "Funktion 3"] },
+    { title: "MODUL B", fields: ["Funktion 1", "Funktion 2"] },
+    { title: "MODUL C", fields: ["Funktion 1"] },
+    { title: "MODUL D", fields: ["Funktion 1", "Funktion 2"] }
+  ];
+
+  const colWidth = 40;
+  const colStartX = 20;
+  const colStartY = 105;
+
+  columns.forEach((col, index) => {
+    const x = colStartX + index * (colWidth + 6);
+
+    // Titelbox
+    pdf.setFillColor(...purpleDark);
+    pdf.rect(x, colStartY, colWidth, 12, "F");
+
+    pdf.setFont("helvetica", "bold");
+    pdf.setFontSize(10);
+    pdf.setTextColor(255, 255, 255);
+    pdf.text(col.title, x + 3, colStartY + 8);
+
+    // Felder
+    col.fields.forEach((field, fIndex) => {
+      const y = colStartY + 15 + fIndex * 12;
+      pdf.setFillColor(...purpleLight);
+      pdf.rect(x, y, colWidth, 10, "F");
+
+      pdf.setFont("helvetica", "normal");
+      pdf.setTextColor(255, 255, 255);
+      pdf.text(field, x + 3, y + 7);
+    });
+  });
+}
+  drawDTPPage(pdf);
   pdf.addPage();
-
+  
   // ------------------------------------------
   // ✅ PAGE 5 – SIGNING Tabellen (Neutral)
   // ------------------------------------------
