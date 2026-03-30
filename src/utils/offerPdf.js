@@ -178,33 +178,50 @@ export function exportOfferPDF(data) {
     pdf.setFont("helvetica","bold");
     pdf.setFontSize(18);
     pdf.setTextColor(...colors.intrumViolet);
-    pdf.text("1  Digital Trust Platform – Die Grundlage für sichere und effiziente digitale Geschäftsprozesse",20,y);
 
-    y += 12;
+    // Dynamischer Textumbruch für den Titel
+    const title = "1  Digital Trust Platform – Die Grundlage für sichere und effiziente digitale Geschäftsprozesse";
+    const titleLines = pdf.splitTextToSize(title, 170);
+    pdf.text(titleLines, 20, y);
+    y += titleLines.length * 10;
+
     pdf.setFont("helvetica","normal");
     pdf.setFontSize(11);
     pdf.setTextColor(...colors.textDark);
 
-    const paragraph =
+    let paragraphY = y;
+    const paragraph1 =
       "Die Digital Trust Platform (DTP) verbindet alle zentralen Elemente für ein durchgängig digitales und vertrauenswürdiges Onboarding in einer modular aufgebauten Lösung: von der Identifikation über Bonitäts- und Fraud-Prüfungen bis hin zur elektronischen Signatur – sicher, rechtskonform und effizient.\n" +
-      "Die Plattform wurde speziell dafür entwickelt, Unternehmen bei der Digitalisierung kritischer Prozesse zu unterstützen, ohne dabei Kompromisse bei Sicherheit, Nutzerfreundlichkeit oder regulatorischer Konformität einzugehen. Sie lässt sich flexibel in bestehende Systemlandschaften integrieren und ermöglicht so individuelle Customer Journeys mit hohem Automatisierungsgrad.\n" +
-      "Kernmodule der DTP sind:";
+      "Die Plattform wurde speziell dafür entwickelt, Unternehmen bei der Digitalisierung kritischer Prozesse zu unterstützen, ohne dabei Kompromisse bei Sicherheit, Nutzerfreundlichkeit oder regulatorischer Konformität einzugehen. Sie lässt sich flexibel in bestehende Systemlandschaften integrieren und ermöglicht so individuelle Customer Journeys mit hohem Automatisierungsgrad.";
 
-    pdf.text(paragraph, 20, y, { maxWidth: 170, lineHeightFactor: 1.4 });
+    pdf.text(paragraph1, 20, paragraphY, { maxWidth: 170, lineHeightFactor: 1.4 });
 
-    y += 50;
+    y = paragraphY + 50;
+
+    // Kernmodule fett mit Abstand
+    pdf.setFont("helvetica","bold");
+    pdf.text("Kernmodule der DTP sind:", 20, y);
+    y += 10;
 
     const bullets = [
-      "Identification: Verschiedene Verfahren wie AutoIdent, VideoIdent oder vor-Ort-Identifikation, je nach regulatorischen Anforderungen.",
-      "Smart Data: Intelligente Prüfungen wie Bonitätsbewertung (AI Credit Scores), Adressverifikation, Fraud Check und Compliance Screening – nahtlos eingebunden in den Onboarding-Prozess.",
-      "Signing: Elektronische Signatur mit Unterstützung aller drei Signaturstufen (EES, FES, QES), rechtssicher und benutzerfreundlich."
+      { name: "Identification", desc: "Verschiedene Verfahren wie AutoIdent, VideoIdent oder vor-Ort-Identifikation, je nach regulatorischen Anforderungen." },
+      { name: "Smart Data", desc: "Intelligente Prüfungen wie Bonitätsbewertung (AI Credit Scores), Adressverifikation, Fraud Check und Compliance Screening – nahtlos eingebunden in den Onboarding-Prozess." },
+      { name: "Signing", desc: "Elektronische Signatur mit Unterstützung aller drei Signaturstufen (EES, FES, QES), rechtssicher und benutzerfreundlich." }
     ];
 
+    pdf.setFont("helvetica","normal");
+
     bullets.forEach(b => {
-      pdf.circle(22, y - 2, 1.5, "F");
-      pdf.text(b, 27, y, { maxWidth: 160, lineHeightFactor: 1.4 });
+      pdf.setFont("helvetica","bold");
+      pdf.text(b.name + ":", 22, y);
+      pdf.setFont("helvetica","normal");
+      pdf.text(b.desc, 27 + pdf.getTextWidth(b.name+": "), y, { maxWidth: 160, lineHeightFactor: 1.4 });
       y += 15;
     });
+
+    y += 5;
+    pdf.setFont("helvetica","bold");
+    pdf.text(" ", 20, y); // optionaler Abstand nach Kernmodule
   }
 
   // ---------------------------------------
