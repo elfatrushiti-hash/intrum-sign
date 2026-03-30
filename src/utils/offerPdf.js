@@ -4,6 +4,10 @@ import autoTable from "jspdf-autotable";
 export function exportOfferPDF(data) {
   const pdf = new jsPDF({ unit: "mm", format: "a4" });
 
+  const margin = 20;
+  const pageWidth = 210;
+  const contentWidth = pageWidth - (margin * 2);
+
   const colors = {
     darkViolet: [23, 4, 86],
     midViolet: [120, 50, 180],
@@ -30,12 +34,12 @@ export function exportOfferPDF(data) {
     pdf.setFont("helvetica","normal");
     pdf.setFontSize(9);
     pdf.setTextColor(120,120,120);
-    pdf.text("Offerte – Digital Trust Platform", 20, 287);
+    pdf.text("Offerte – Digital Trust Platform", margin, 287);
     pdf.text(`Seite ${page}`, 190, 287, {align:"right"});
   }
 
   // ---------------------------------------
-  // COVER PAGE
+  // COVER
   // ---------------------------------------
   function drawCover() {
     const steps = 100;
@@ -50,11 +54,11 @@ export function exportOfferPDF(data) {
     pdf.setFont("helvetica","bold");
     pdf.setFontSize(28);
     pdf.setTextColor(...colors.textLight);
-    pdf.text("Offerte", 20, 80);
+    pdf.text("Offerte", margin, 80);
 
     pdf.setFont("helvetica","normal");
     pdf.setFontSize(16);
-    pdf.text("Digital Trust Platform", 20, 95);
+    pdf.text("Digital Trust Platform", margin, 95);
 
     pdf.setFont("helvetica","bold");
     pdf.setFontSize(32);
@@ -62,7 +66,7 @@ export function exportOfferPDF(data) {
   }
 
   // ---------------------------------------
-  // SEITE 2 – UNTERNEHMENSDATEN
+  // SEITE 2
   // ---------------------------------------
   function drawCompanyPage() {
     drawHeaderFooter(2);
@@ -70,31 +74,32 @@ export function exportOfferPDF(data) {
     pdf.setFont("helvetica","bold");
     pdf.setFontSize(22);
     pdf.setTextColor(...colors.intrumViolet);
-    pdf.text("Offerte", 20, 30);
+    pdf.text("Offerte", margin, 30);
 
     let y = 55;
+
     pdf.setFont("helvetica","normal");
     pdf.setFontSize(11);
-    pdf.setTextColor(...colors.textDark);
-    pdf.text("Ausgearbeitet von",20,y);
+    pdf.text("Ausgearbeitet von",margin,y);
 
     y += 10;
     pdf.setFont("helvetica","bold");
-    pdf.text("Intrum AG, Eschenstrasse 12, 8603 Schwerzenbach",20,y);
+    pdf.text("Intrum AG, Eschenstrasse 12, 8603 Schwerzenbach",margin,y);
 
     y += 6;
     pdf.setFont("helvetica","normal");
-    pdf.text("(nachfolgend Intrum genannt)",20,y);
+    pdf.text("(nachfolgend Intrum genannt)",margin,y);
 
     y += 10;
-    pdf.text("für",20,y);
+    pdf.text("für",margin,y);
 
     y += 10;
     pdf.setFont("helvetica","bold");
-    pdf.text("Firma (nachfolgend Partner genannt)",20,y);
+    pdf.text("Firma (nachfolgend Partner genannt)",margin,y);
 
     autoTable(pdf,{
       startY: y + 8,
+      margin: { left: margin, right: margin },
       head:[["Angabe","Details"]],
       body:[
         ["Firmenname",data.company || "—"],
@@ -102,26 +107,23 @@ export function exportOfferPDF(data) {
         ["Handelsregister",data.hrRegister || "—"],
         ["Adresse",data.street || "—"],
         ["PLZ / Ort",`${data.postcode || ""} ${data.city || ""}`]
-      ],
-      headStyles:{fillColor:colors.cardBg,textColor:colors.textDark,fontStyle:"bold"},
-      styles:{fontSize:10.5,textColor:colors.textDark,lineColor:colors.border}
+      ]
     });
 
     autoTable(pdf,{
       startY: pdf.lastAutoTable.finalY + 15,
+      margin: { left: margin, right: margin },
       head:[["Ansprechperson","Details"]],
       body:[
         ["Name",data.contactName || "—"],
         ["Telefon",data.contactPhone || "—"],
         ["E-Mail",data.contactEmail || "—"]
-      ],
-      headStyles:{fillColor:colors.cardBg,textColor:colors.textDark,fontStyle:"bold"},
-      styles:{fontSize:10.5,textColor:colors.textDark,lineColor:colors.border}
+      ]
     });
   }
 
   // ---------------------------------------
-  // SEITE 3 – MODERNES INHALTSVERZEICHNIS
+  // SEITE 3
   // ---------------------------------------
   function drawTableOfContents() {
     drawHeaderFooter(3);
@@ -129,104 +131,112 @@ export function exportOfferPDF(data) {
     pdf.setFont("helvetica","bold");
     pdf.setFontSize(22);
     pdf.setTextColor(...colors.intrumViolet);
-    pdf.text("Inhalt", 20, 25);
+    pdf.text("Inhalt", margin, 25);
 
     let y = 40;
 
     const toc = [
       { title: "1  Digital Trust Platform – Überblick", page: "4" },
       { title: "2  SIGNING", page: "5" },
-      { title: "   2.1  EES – Einfache Signatur", page: "5" },
-      { title: "   2.2  FES – Fortgeschrittene Signatur", page: "5" },
-      { title: "   2.3  QES – Qualifizierte Signatur", page: "5" },
-      { title: "   2.4  Identifikation / seal.ID", page: "5" },
       { title: "3  Setup Gebühren", page: "6" },
       { title: "4  Verschwiegenheitsklausel", page: "6" },
       { title: "5  Gültigkeit des Angebots", page: "6" },
     ];
 
-    function drawDottedLineAfterText(text, y, pageX) {
-      const textWidth = pdf.getTextWidth(text) + 2;
-      const startX = 20 + textWidth;
-      const endX = pageX - 8;
-      const dotSpacing = 2;
-      for (let x = startX; x < endX; x += dotSpacing) {
+    function dottedLine(text, y) {
+      const textWidth = pdf.getTextWidth(text);
+      const startX = margin + textWidth + 2;
+      const endX = pageWidth - margin - 8;
+
+      for (let x=startX; x<endX; x+=2) {
         pdf.circle(x, y, 0.3, "F");
       }
     }
 
     toc.forEach(row => {
-      pdf.setFont("helvetica","normal");
-      pdf.setFontSize(12);
-      pdf.setTextColor(...colors.textDark);
-
-      pdf.text(row.title, 20, y);
-      drawDottedLineAfterText(row.title, y, 190);
-      pdf.text(row.page, 190, y, { align: "right" });
-
+      pdf.text(row.title, margin, y);
+      dottedLine(row.title, y);
+      pdf.text(row.page, pageWidth - margin, y, {align:"right"});
       y += 10;
     });
   }
 
   // ---------------------------------------
-  // SEITE 4 – DIGITAL TRUST PLATFORM
+  // SEITE 4
   // ---------------------------------------
   function drawDTPPage() {
     drawHeaderFooter(4);
 
     let y = 25;
+
     pdf.setFont("helvetica","bold");
     pdf.setFontSize(18);
     pdf.setTextColor(...colors.intrumViolet);
 
-    // Dynamischer Textumbruch für den Titel
-    const title = "1  Digital Trust Platform – Die Grundlage für sichere und effiziente digitale Geschäftsprozesse";
-    const titleLines = pdf.splitTextToSize(title, 170);
-    pdf.text(titleLines, 20, y);
-    y += titleLines.length * 10;
+    const title =
+      "1  Digital Trust Platform – Die Grundlage für sichere und effiziente digitale Geschäftsprozesse";
+
+    const titleLines = pdf.splitTextToSize(title, contentWidth);
+    pdf.text(titleLines, margin, y);
+    y += titleLines.length * 8 + 5;
 
     pdf.setFont("helvetica","normal");
     pdf.setFontSize(11);
     pdf.setTextColor(...colors.textDark);
 
-    let paragraphY = y;
-    const paragraph1 =
-      "Die Digital Trust Platform (DTP) verbindet alle zentralen Elemente für ein durchgängig digitales und vertrauenswürdiges Onboarding in einer modular aufgebauten Lösung: von der Identifikation über Bonitäts- und Fraud-Prüfungen bis hin zur elektronischen Signatur – sicher, rechtskonform und effizient.\n" +
-      "Die Plattform wurde speziell dafür entwickelt, Unternehmen bei der Digitalisierung kritischer Prozesse zu unterstützen, ohne dabei Kompromisse bei Sicherheit, Nutzerfreundlichkeit oder regulatorischer Konformität einzugehen. Sie lässt sich flexibel in bestehende Systemlandschaften integrieren und ermöglicht so individuelle Customer Journeys mit hohem Automatisierungsgrad.";
+    const paragraph =
+      "Die Digital Trust Platform (DTP) verbindet alle zentralen Elemente für ein durchgängig digitales und vertrauenswürdiges Onboarding in einer modular aufgebauten Lösung: von der Identifikation über Bonitäts- und Fraud-Prüfungen bis hin zur elektronischen Signatur – sicher, rechtskonform und effizient. " +
+      "Die Plattform wurde speziell dafür entwickelt, Unternehmen bei der Digitalisierung kritischer Prozesse zu unterstützen, ohne dabei Kompromisse bei Sicherheit, Nutzerfreundlichkeit oder regulatorischer Konformität einzugehen. " +
+      "Sie lässt sich flexibel in bestehende Systemlandschaften integrieren und ermöglicht so individuelle Customer Journeys mit hohem Automatisierungsgrad.";
 
-    pdf.text(paragraph1, 20, paragraphY, { maxWidth: 170, lineHeightFactor: 1.4 });
+    const textLines = pdf.splitTextToSize(paragraph, contentWidth);
+    pdf.text(textLines, margin, y);
+    y += textLines.length * 6 + 10;
 
-    y = paragraphY + 50;
-
-    // Kernmodule fett mit Abstand
     pdf.setFont("helvetica","bold");
-    pdf.text("Kernmodule der DTP sind:", 20, y);
+    pdf.text("Kernmodule der DTP sind:", margin, y);
     y += 10;
 
+    const bulletIndent = margin + 5;
+    const textIndent = margin + 25;
+    const bulletWidth = pageWidth - textIndent - margin;
+
     const bullets = [
-      { name: "Identification", desc: "Verschiedene Verfahren wie AutoIdent, VideoIdent oder vor-Ort-Identifikation, je nach regulatorischen Anforderungen." },
-      { name: "Smart Data", desc: "Intelligente Prüfungen wie Bonitätsbewertung (AI Credit Scores), Adressverifikation, Fraud Check und Compliance Screening – nahtlos eingebunden in den Onboarding-Prozess." },
-      { name: "Signing", desc: "Elektronische Signatur mit Unterstützung aller drei Signaturstufen (EES, FES, QES), rechtssicher und benutzerfreundlich." }
+      {
+        title:"Identification:",
+        text:"Verschiedene Verfahren wie AutoIdent, VideoIdent oder vor-Ort-Identifikation, je nach regulatorischen Anforderungen."
+      },
+      {
+        title:"Smart Data:",
+        text:"Intelligente Prüfungen wie Bonitätsbewertung (AI Credit Scores), Adressverifikation, Fraud Check und Compliance Screening – nahtlos eingebunden in den Onboarding-Prozess."
+      },
+      {
+        title:"Signing:",
+        text:"Elektronische Signatur mit Unterstützung aller drei Signaturstufen (EES, FES, QES), rechtssicher und benutzerfreundlich."
+      }
     ];
 
-    pdf.setFont("helvetica","normal");
-
     bullets.forEach(b => {
-      pdf.setFont("helvetica","bold");
-      pdf.text(b.name + ":", 22, y);
-      pdf.setFont("helvetica","normal");
-      pdf.text(b.desc, 27 + pdf.getTextWidth(b.name+": "), y, { maxWidth: 160, lineHeightFactor: 1.4 });
-      y += 15;
-    });
 
-    y += 5;
-    pdf.setFont("helvetica","bold");
-    pdf.text(" ", 20, y); // optionaler Abstand nach Kernmodule
+      pdf.circle(bulletIndent - 3, y-2, 1, "F");
+
+      pdf.setFont("helvetica","bold");
+      pdf.text(b.title, bulletIndent, y);
+
+      const titleWidth = pdf.getTextWidth(b.title);
+
+      pdf.setFont("helvetica","normal");
+      const lines = pdf.splitTextToSize(
+        b.text,
+        bulletWidth - titleWidth
+      );
+
+      pdf.text(lines, bulletIndent + titleWidth + 2, y);
+
+      y += lines.length * 6 + 6;
+    });
   }
 
-  // ---------------------------------------
-  // PDF erzeugen
-  // ---------------------------------------
   drawCover();
   pdf.addPage();
   drawCompanyPage();
