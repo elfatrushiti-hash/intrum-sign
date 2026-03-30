@@ -125,11 +125,57 @@ export function exportOfferPDF(data) {
   }
 
   // ---------------------------------------
+  // SEITE 3 – MODERNES INHALTSVERZEICHNIS
+  // ---------------------------------------
+  function drawTableOfContents() {
+    drawHeaderFooter(3);
+
+    pdf.setFont("helvetica","bold");
+    pdf.setFontSize(22);
+    pdf.setTextColor(...colors.intrumViolet);
+    pdf.text("Inhalt", 20, 25);
+
+    let y = 40;
+
+    const toc = [
+      { title: "1  Digital Trust Platform – Überblick", page: "4" },
+      { title: "2  SIGNING", page: "5" },
+      { title: "   2.1  EES – Einfache Signatur", page: "5" },
+      { title: "   2.2  FES – Fortgeschrittene Signatur", page: "5" },
+      { title: "   2.3  QES – Qualifizierte Signatur", page: "5" },
+      { title: "   2.4  Identifikation / seal.ID", page: "5" },
+      { title: "3  Setup Gebühren", page: "6" },
+      { title: "4  Verschwiegenheitsklausel", page: "6" },
+      { title: "5  Gültigkeit des Angebots", page: "6" },
+    ];
+
+    function drawDottedLine(x, y, width) {
+      const dotSpacing = 2;
+      for (let i = 0; i < width; i += dotSpacing) {
+        pdf.circle(x + i, y, 0.3, "F");
+      }
+    }
+
+    toc.forEach(row => {
+      pdf.setFont("helvetica","normal");
+      pdf.setFontSize(12);
+      pdf.setTextColor(...colors.textDark);
+
+      pdf.text(row.title, 20, y);
+      drawDottedLine(20, y, 160);
+      pdf.text(row.page, 190, y, { align: "right" });
+      y += 10;
+    });
+  }
+
+  // ---------------------------------------
   // PDF erzeugen
   // ---------------------------------------
   drawCover();
   pdf.addPage();
   drawCompanyPage();
+  pdf.addPage();
+  drawTableOfContents();
 
   pdf.save(`Offerte_${data.company || "Angebot"}.pdf`);
 }
