@@ -22,7 +22,7 @@ export function exportOfferPDF(data) {
 
 function drawDottedLine(pdf, x, y, width) {
   const dotCount = Math.floor(width / 2); // Menge der Punkte, anpassen falls nötig
-  const dots = ".".repeat(dotCount);
+  const dots = " ".repeat(dotCount);
 
   pdf.setFont("helvetica", "normal");
   pdf.setFontSize(10);
