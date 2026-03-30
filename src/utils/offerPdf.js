@@ -26,6 +26,14 @@ export function exportOfferPDF(data) {
  // ✅ Seite 5
   drawSigningPage(pdf, data);
 
+  
+  // ✅ Seite 6
+  drawFinalPage(pdf, data);
+
+  // Export
+  pdf.save("Offerte.pdf");
+
+
 
 
 function drawDottedLine(pdf, x, y, width) {
@@ -347,11 +355,20 @@ function drawSigningPage(pdf, data) {
   drawSigningPage(pdf, data);
   pdf.addPage();
 
-  // ------------------------------------------
-  // ✅ PAGE 6 – Setup, Verschwiegenheit, Gültigkeit (Neutral)
-  // ------------------------------------------
+ // ----------------------------------------------------------
+// ✅ Seite 6 – Setup, Verschwiegenheit, Gültigkeit (neutral)
+// ----------------------------------------------------------
+function drawFinalPage(pdf, data) {
+
+  const grayLight = [240, 240, 240];
+  const textColor = [0, 0, 0];
+
+  // -------------------------------
+  // ✅ 1. Kapitel: Setup-Gebühren
+  // -------------------------------
   pdf.setFont("helvetica", "bold");
-  pdf.setFontSize(16);
+  pdf.setFontSize(18);
+  pdf.setTextColor(...textColor);
   pdf.text("3. Setup Gebühren", 20, 20);
 
   autoTable(pdf, {
@@ -360,43 +377,65 @@ function drawSigningPage(pdf, data) {
     body: [
       ["Setup Fee (einmalig)", "5500.00"],
       ["Ongoing Fee (jährlich)", "2500.00"],
-      ["SIGN pro User / Monat", `${(data.signUsers || 0) * 9}.00`],
+      ["SIGN pro Benutzer/Monat", (data.signUsers || 0) * 9],
       ["White Labeling", data.whiteLabeling ? "2500.00" : "—"],
     ],
-    headStyles: { fillColor: [230, 230, 230] },
+    headStyles: { fillColor: grayLight },
     styles: { fontSize: 10 },
-    margin: { left: 20, right: 20 },
+    margin: { left: 20, right: 20 }
   });
 
+  let nextY = pdf.lastAutoTable.finalY + 20;
+
+  // ----------------------------------------------
+  // ✅ 2. Kapitel: Verschwiegenheitsklausel (neutral)
+  // ----------------------------------------------
   pdf.setFont("helvetica", "bold");
   pdf.setFontSize(16);
-  pdf.text("4. Verschwiegenheitsklausel", 20, pdf.lastAutoTable.finalY + 20);
+  pdf.text("4. Verschwiegenheitsklausel", 20, nextY);
 
   pdf.setFont("helvetica", "normal");
   pdf.setFontSize(11);
-  pdf.text(
-    "Dieser Abschnitt ist neutral gehalten. Hier können Sie eigene Texte zur Vertraulichkeit hinterlegen.",
-    20,
-    pdf.lastAutoTable.finalY + 35,
-    { maxWidth: 170 }
-  );
+
+  const confidentialityText =
+    "Dies ist ein neutraler Beispielabsatz für eine Verschwiegenheitsklausel. " +
+    "An dieser Stelle kannst du deine eigenen rechtlichen Hinweise oder " +
+    "vertraulichen Bestimmungen einfügen.";
+
+  pdf.text(confidentialityText, 20, nextY + 12, {
+    maxWidth: 170,
+    lineHeightFactor: 1.4
+  });
+
+  // ----------------------------------------------
+  // ✅ 3. Kapitel: Gültigkeit des Angebots
+  // ----------------------------------------------
+  nextY += 45;
 
   pdf.setFont("helvetica", "bold");
   pdf.setFontSize(16);
-  pdf.text("5. Gültigkeit des Angebots", 20, pdf.lastAutoTable.finalY + 60);
+  pdf.text("5. Gültigkeit des Angebots", 20, nextY);
 
   pdf.setFont("helvetica", "normal");
-  pdf.text(
-    `Dieses Angebot ist gültig bis: ${data.validUntil || ""}`,
-    20,
-    pdf.lastAutoTable.finalY + 75
-  );
+  pdf.setFontSize(11);
 
-  // Footer
+  const validityText = `Dieses Angebot ist gültig bis: ${data.validUntil || ""}`;
+
+  pdf.text(validityText, 20, nextY + 12);
+
+  // ----------------------------------------------
+  // ✅ Footer (neutral)
+  // ----------------------------------------------
+  pdf.setFont("helvetica", "normal");
   pdf.setFontSize(9);
-  pdf.setTextColor(100, 100, 100);
+  pdf.setTextColor(120,120,120);
+
   pdf.text("Offerte – Digital Trust Platform", 20, 285);
   pdf.text("intrum AG", 190, 285, { align: "right" });
+}
+
+  drawFinalPage(pdf, data);
+  pdf.addPage();
 
   // ------------------------------------------
   // ✅ EXPORT
