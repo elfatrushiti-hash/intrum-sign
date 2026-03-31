@@ -338,6 +338,44 @@ pdf.text(bottomLines, marginLeft, bottomTextY);
   // ENDE SEITE 4
   // =========================
 
+  // =========================
+// SEITE 5 — SIGNING
+// =========================
+function drawSigningPage() {
+  drawHeaderFooter(5);
+
+  const marginLeft = 20;
+  const marginRight = 20;
+  const maxTextWidth = 210 - marginLeft - marginRight;
+
+  let y = 20;
+
+  // Titel
+  pdf.setFont("helvetica", "bold");
+  pdf.setFontSize(14);
+  pdf.setTextColor(...colors.textDark);
+
+  pdf.text("2 SIGNING", marginLeft, y);
+
+  y += 8;
+
+  // Einleitungstext
+  pdf.setFont("helvetica", "normal");
+  pdf.setFontSize(10);
+  pdf.setTextColor(...colors.textDark);
+
+  const introText =
+    "Signing ermöglicht die digitale, medienbruchfreie und rechtskonforme Unterzeichnung von Dokumenten – wahlweise mit einfacher, fortgeschrittener oder qualifizierter elektronischer Signatur. Ideal für effiziente Vertragsabschlüsse im digitalen Raum.";
+
+  const introLines = pdf.splitTextToSize(introText, maxTextWidth);
+
+  pdf.text(introLines, marginLeft, y);
+
+  y += introLines.length * 6 + 4;
+}
+// =========================
+// ENDE SEITE 5
+// =========================
 
   // =========================
   // SEITENAUFRUF (REIHENFOLGE)
@@ -353,6 +391,9 @@ pdf.text(bottomLines, marginLeft, bottomTextY);
 
   drawDTPPage();      // Seite 4
   pdf.addPage();
+
+  pdf.addPage();      // Seite 5
+  drawSigningPage();
   
   pdf.save(`Offerte_${data.company || "Angebot"}.pdf`);
 }
