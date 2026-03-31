@@ -352,14 +352,14 @@ function drawSigningPage() {
   const maxTextWidth = pageWidth - marginLeft - marginRight;
   const marginBottom = 20;
 
-  let y = 10;
+  let y = 20;
 
   // Titel
   pdf.setFont("helvetica", "bold");
   pdf.setFontSize(14);
   pdf.setTextColor(...colors.textDark);
   pdf.text("2 SIGNING", marginLeft, y);
-  y += 10;
+  y += 5;
 
   // Einleitender Text
   pdf.setFont("helvetica", "normal");
