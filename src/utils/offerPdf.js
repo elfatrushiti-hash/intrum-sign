@@ -242,7 +242,7 @@ function drawDTPPage() {
   ];
 
   const boxWidth = 35;
-  const gapRest = 25; // Abstand Kachel1↔2 für REST API
+  const gapRest = 35; // Abstand Kachel1↔2 für REST API
   const gapNormal = 10; // Abstand andere Kacheln
   const heights = kacheln.map(k => 8 + k.boxes.length * 9);
   const maxHeight = Math.max(...heights);
@@ -252,10 +252,10 @@ function drawDTPPage() {
   const barWidth = boxWidth * kacheln.length + gapRest + 2 * gapNormal;
   const barY = y + maxHeight / 2 - 7;
   const barHeight = 14;
-  pdf.setFillColor(150, 150, 150); // dunkleres Grau
+  pdf.setFillColor(180, 180, 180); // etwas dunkleres Grau
   pdf.roundedRect(barX, barY, barWidth, barHeight, 2, 2, "F");
 
-  // REST API Text im Vordergrund, zentriert auf Balken
+  // REST API Text **in den Vordergrund**
   const restX = marginLeft + boxWidth + gapRest / 2 + boxWidth / 2;
   const restY = barY + barHeight / 2 - 4; // mittig Balken
   pdf.setFont("helvetica", "bold");
@@ -264,23 +264,27 @@ function drawDTPPage() {
   pdf.text("REST", restX, restY, { align: "center" });
   pdf.text("API", restX, restY + 4, { align: "center" });
 
-  // Kacheln zeichnen
+  // Kacheln links/rechts vom REST API
   kacheln.forEach((k, i) => {
     let x;
     if (i === 0) x = marginLeft;
     else if (i === 1) x = marginLeft + boxWidth + gapRest;
+    else if (i === 2) x = marginLeft + boxWidth + gapRest + (i - 1) * (boxWidth + gapNormal);
     else x = marginLeft + boxWidth + gapRest + (i - 1) * (boxWidth + gapNormal);
 
     const height = 8 + k.boxes.length * 9;
 
+    // Kachel Hintergrund
     pdf.setFillColor(...colors.grayBox);
     pdf.roundedRect(x, y, boxWidth, height, 2, 2, "F");
 
+    // Titel Kachel
     pdf.setFont("helvetica", "bold");
     pdf.setFontSize(8);
     pdf.setTextColor(...colors.textDark);
     pdf.text(k.title, x + 2, y + 6);
 
+    // Cards in Kachel
     k.boxes.forEach((b, j) => {
       const yy = y + 8 + j * 9;
       pdf.setFillColor(...colors.intrumPurple);
