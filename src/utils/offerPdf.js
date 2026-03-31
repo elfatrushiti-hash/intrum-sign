@@ -182,10 +182,8 @@ function drawDTPPage() {
   pdf.setFont("helvetica", "bold");
   pdf.setFontSize(14);
   pdf.setTextColor(...colors.textDark);
-
   const title =
     "1 Digital Trust Platform – Die Grundlage für sichere und effiziente digitale Geschäftsprozesse";
-
   const titleLines = pdf.splitTextToSize(title, maxTextWidth);
   pdf.text(titleLines, marginLeft, y);
   y += titleLines.length * 6 + 3;
@@ -193,10 +191,8 @@ function drawDTPPage() {
   // Beschreibung
   pdf.setFont("helvetica", "normal");
   pdf.setFontSize(10);
-
   const paragraph =
     "Die Digital Trust Platform (DTP) verbindet alle zentralen Elemente für ein durchgängig digitales und vertrauenswürdiges Onboarding in einer modular aufgebauten Lösung: von der Identifikation über Bonitäts- und Fraud-Prüfungen bis hin zur elektronischen Signatur – sicher, rechtskonform und effizient. Die Plattform wurde speziell dafür entwickelt, Unternehmen bei der Digitalisierung kritischer Prozesse zu unterstützen, ohne dabei Kompromisse bei Sicherheit, Nutzerfreundlichkeit oder regulatorischer Konformität einzugehen. Sie lässt sich flexibel in bestehende Systemlandschaften integrieren und ermöglicht so individuelle Customer Journeys mit hohem Automatisierungsgrad.";
-
   const textLines = pdf.splitTextToSize(paragraph, maxTextWidth);
   pdf.text(textLines, marginLeft, y);
   y += textLines.length * 5 + 3;
@@ -245,10 +241,10 @@ function drawDTPPage() {
     { title: "SIGNING", boxes: ["EES", "FES", "QES", "SIGN"] },
   ];
 
-  const boxWidth = 35; 
-  const gap = 12; // Abstand zwischen KUNDE und IDENTIFICATION größer für REST API
+  const boxWidth = 35;
+  const gap = 30; // größerer Abstand zwischen KUNDE und IDENTIFICATION für REST API
 
-  // Berechne maximale Höhe der Kacheln
+  // Höhe der Kacheln
   const heights = kacheln.map(k => 10 + k.boxes.length * 9);
   const maxHeight = Math.max(...heights);
 
@@ -257,9 +253,8 @@ function drawDTPPage() {
   const barWidth = kacheln.length * boxWidth + (kacheln.length - 1) * gap;
   const barY = y + maxHeight / 2 - 7;
   const barHeight = 14;
-
-  pdf.setFillColor(200, 200, 200); // dunklerer Grauton
-  pdf.roundedRect(barX, barY, barWidth, barHeight, 2, 2, "F"); // abgerundete Ecken
+  pdf.setFillColor(180, 180, 180); // etwas dunkleres Grau
+  pdf.roundedRect(barX, barY, barWidth, barHeight, 2, 2, "F");
 
   // REST API Text zwischen KUNDE und IDENTIFICATION
   const restX = marginLeft + boxWidth + gap / 2;
@@ -272,11 +267,11 @@ function drawDTPPage() {
 
   // Kacheln zeichnen
   kacheln.forEach((k, i) => {
-    const x = marginLeft + i * (boxWidth + gap);
+    const x = marginLeft + i * (boxWidth + (i === 0 ? gap : 10)); // nur KUNDE-IDENTIFICATION größerer Abstand
     const height = 10 + k.boxes.length * 9;
 
     pdf.setFillColor(...colors.grayBox);
-    pdf.roundedRect(x, y, boxWidth, height, 2, 2, "F"); // abgerundet
+    pdf.roundedRect(x, y, boxWidth, height, 2, 2, "F");
 
     pdf.setFont("helvetica", "bold");
     pdf.setFontSize(8);
@@ -286,7 +281,7 @@ function drawDTPPage() {
     k.boxes.forEach((b, j) => {
       const yy = y + 8 + j * 9;
       pdf.setFillColor(...colors.intrumPurple);
-      pdf.roundedRect(x + 1, yy, boxWidth - 2, 7, 1, 1, "F"); // abgerundet
+      pdf.roundedRect(x + 1, yy, boxWidth - 2, 7, 1, 1, "F");
 
       pdf.setTextColor(...colors.textLight);
       pdf.text(b, x + 2, yy + 5);
