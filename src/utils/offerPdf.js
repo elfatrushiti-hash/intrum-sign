@@ -170,16 +170,114 @@ export function exportOfferPDF(data) {
   // SEITE 4 — DIGITAL TRUST PLATFORM
   // =========================
   function drawDTPPage() {
-    drawHeaderFooter(4);
+  drawHeaderFooter(4);
 
-    const marginLeft = 20;
-    const maxTextWidth = 210 - marginLeft - 20;
+  const marginLeft = 20;
+  const maxTextWidth = 210 - marginLeft - 20;
 
-    let y = 20;
+  let y = 20;
 
-    // (Rest deiner Seite 4 bleibt UNVERÄNDERT)
-    // ...
-  }
+  // Titel
+  pdf.setFont("helvetica", "bold");
+  pdf.setFontSize(14);
+  pdf.setTextColor(...colors.textDark);
+
+  const title =
+    "1 Digital Trust Platform – Die Grundlage für sichere und effiziente digitale Geschäftsprozesse";
+
+  const titleLines = pdf.splitTextToSize(title, maxTextWidth);
+  pdf.text(titleLines, marginLeft, y);
+  y += titleLines.length * 6 + 3;
+
+  // Beschreibung
+  pdf.setFont("helvetica", "normal");
+  pdf.setFontSize(10);
+
+  const paragraph =
+    "Die Digital Trust Platform (DTP) verbindet alle zentralen Elemente für ein durchgängig digitales und vertrauenswürdiges Onboarding in einer modular aufgebauten Lösung: von der Identifikation über Bonitäts- und Fraud-Prüfungen bis hin zur elektronischen Signatur – sicher, rechtskonform und effizient. Die Plattform wurde speziell dafür entwickelt, Unternehmen bei der Digitalisierung kritischer Prozesse zu unterstützen, ohne dabei Kompromisse bei Sicherheit, Nutzerfreundlichkeit oder regulatorischer Konformität einzugehen. Sie lässt sich flexibel in bestehende Systemlandschaften integrieren und ermöglicht so individuelle Customer Journeys mit hohem Automatisierungsgrad.";
+
+  const textLines = pdf.splitTextToSize(paragraph, maxTextWidth);
+  pdf.text(textLines, marginLeft, y);
+  y += textLines.length * 5 + 3;
+
+  // Bullet Titel
+  pdf.setFont("helvetica", "bold");
+  pdf.text("Kernmodule der DTP sind:", marginLeft, y);
+  y += 5;
+
+  // Bulletpoints
+  const bullets = [
+    {
+      title: "Identification",
+      text:
+        "Verschiedene Verfahren wie AutoIdent, VideoIdent oder vor-Ort-Identifikation, je nach regulatorischen Anforderungen.",
+    },
+    {
+      title: "Smart Data",
+      text:
+        "Intelligente Prüfungen wie Bonitätsbewertung (AI Credit Scores), Adressverifikation, Fraud Check und Compliance Screening – nahtlos eingebunden in den Onboarding-Prozess.",
+    },
+    {
+      title: "Signing",
+      text:
+        "Elektronische Signatur mit Unterstützung aller drei Signaturstufen (EES, FES, QES), rechtssicher und benutzerfreundlich.",
+    },
+  ];
+
+  bullets.forEach((b) => {
+    pdf.setFont("helvetica", "bold");
+    pdf.text("•", marginLeft, y);
+
+    pdf.text(`${b.title}:`, marginLeft + 4, y);
+
+    pdf.setFont("helvetica", "normal");
+    const lines = pdf.splitTextToSize(b.text, maxTextWidth - 25);
+    pdf.text(lines, marginLeft + 25, y);
+
+    y += lines.length * 5 + 2;
+  });
+
+  y += 4;
+
+  // Kacheln
+  const kacheln = [
+    { title: "Kunde", boxes: ["Self-Onboarding", "CRM", "Interne Applikation", "Externe Applikation"] },
+    { title: "IDENTIFICATION", boxes: ["AutoIdent", "VideoIdent", "OnlineIdent", "QES-Ident (seal.ID)", "BankIdent (ab 2026)"] },
+    { title: "SMART DATA", boxes: ["Credit Scores", "Data Reports", "Address", "Fraud", "Compliance", "ZEK/IKO/KREMO"] },
+    { title: "SIGNING", boxes: ["EES", "FES", "QES", "SIGN"] },
+  ];
+
+  const boxWidth = 40;
+  const gap = 5;
+
+  kacheln.forEach((k, i) => {
+    const x = marginLeft + i * (boxWidth + gap);
+
+    const height = 10 + k.boxes.length * 9;
+
+    // Hintergrund
+    pdf.setFillColor(...colors.grayBox);
+    pdf.rect(x, y, boxWidth, height, "F");
+
+    // Titel
+    pdf.setFont("helvetica", "bold");
+    pdf.setFontSize(9);
+    pdf.setTextColor(...colors.textDark);
+    pdf.text(k.title, x + 2, y + 6);
+
+    // Cards
+    pdf.setFontSize(8);
+    k.boxes.forEach((b, j) => {
+      const yy = y + 8 + j * 9;
+
+      pdf.setFillColor(...colors.intrumPurple);
+      pdf.rect(x + 1, yy, boxWidth - 2, 7, "F");
+
+      pdf.setTextColor(...colors.textLight);
+      pdf.text(b, x + 2, yy + 5);
+    });
+  });
+}
   // =========================
   // ENDE SEITE 4
   // =========================
@@ -198,6 +296,7 @@ export function exportOfferPDF(data) {
   pdf.addPage();
 
   drawDTPPage();      // Seite 4
-
+  pdf.addPage();
+  
   pdf.save(`Offerte_${data.company || "Angebot"}.pdf`);
 }
