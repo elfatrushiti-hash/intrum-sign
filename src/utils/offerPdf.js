@@ -5,19 +5,16 @@ export function exportOfferPDF(data) {
   const pdf = new jsPDF({ unit: "mm", format: "a4" });
 
   const colors = {
-    intrumViolet: [60, 20, 140], // Alle ehemals blauen Elemente jetzt Intrum-Violett
+    intrumPurple: [127, 61, 167],       // offizielles Intrum Violett #7F3DA7 :contentReference[oaicite:1]{index=1}
+    intrumPurpleSoft: [236, 226, 241],  // Soft Violett Hintergrund #ECE2F1 :contentReference[oaicite:2]{index=2}
     textDark: [0, 0, 0],
     textLight: [255, 255, 255],
-    cardBg: [245, 245, 250],
     border: [220, 220, 230],
     grayBox: [240, 240, 240],
   };
 
-  // ---------------------------------------
-  // HEADER + FOOTER
-  // ---------------------------------------
   function drawHeaderFooter(page) {
-    pdf.setFillColor(...colors.intrumViolet);
+    pdf.setFillColor(...colors.intrumPurple);
     pdf.rect(0, 0, 210, 6, "F");
 
     pdf.setFont("helvetica", "bold");
@@ -32,11 +29,8 @@ export function exportOfferPDF(data) {
     pdf.text(`Seite ${page}`, 190, 287, { align: "right" });
   }
 
-  // ---------------------------------------
-  // COVER PAGE
-  // ---------------------------------------
   function drawCover() {
-    pdf.setFillColor(...colors.intrumViolet);
+    pdf.setFillColor(...colors.intrumPurple);
     pdf.rect(0, 0, 210, 297, "F");
 
     pdf.setFont("helvetica", "bold");
@@ -53,15 +47,12 @@ export function exportOfferPDF(data) {
     pdf.text("INTRUM", 105, 260, { align: "center" });
   }
 
-  // ---------------------------------------
-  // SEITE 2 – UNTERNEHMENSDATEN
-  // ---------------------------------------
   function drawCompanyPage() {
     drawHeaderFooter(2);
 
     pdf.setFont("helvetica", "bold");
     pdf.setFontSize(22);
-    pdf.setTextColor(...colors.intrumViolet);
+    pdf.setTextColor(...colors.intrumPurple);
     pdf.text("Offerte", 20, 30);
 
     let y = 55;
@@ -95,7 +86,7 @@ export function exportOfferPDF(data) {
         ["Adresse", data.street || "—"],
         ["PLZ / Ort", `${data.postcode || ""} ${data.city || ""}`],
       ],
-      headStyles: { fillColor: colors.cardBg, textColor: colors.textDark, fontStyle: "bold" },
+      headStyles: { fillColor: colors.intrumPurpleSoft, textColor: colors.textDark, fontStyle: "bold" },
       styles: { fontSize: 10, textColor: colors.textDark, lineColor: colors.border },
       margin: { left: 20, right: 20 },
     });
@@ -108,15 +99,12 @@ export function exportOfferPDF(data) {
         ["Telefon", data.contactPhone || "—"],
         ["E-Mail", data.contactEmail || "—"],
       ],
-      headStyles: { fillColor: colors.cardBg, textColor: colors.textDark, fontStyle: "bold" },
+      headStyles: { fillColor: colors.intrumPurpleSoft, textColor: colors.textDark, fontStyle: "bold" },
       styles: { fontSize: 10, textColor: colors.textDark, lineColor: colors.border },
       margin: { left: 20, right: 20 },
     });
   }
 
-  // ---------------------------------------
-  // SEITE 3 – INHALTSVERZEICHNIS
-  // ---------------------------------------
   function drawTableOfContents() {
     drawHeaderFooter(3);
 
@@ -145,71 +133,54 @@ export function exportOfferPDF(data) {
 
       const textWidth = pdf.getTextWidth(row.title);
       const startX = 20 + textWidth + 2;
-      const endX = 180; // Dynamischer Abstand kurz vor Seitenzahl
+      const endX = 180;
       const dotCount = Math.floor((endX - startX) / pdf.getTextWidth("."));
-      const dots = ".".repeat(dotCount);
-      pdf.text(dots, startX, y);
+      pdf.text(".".repeat(dotCount), startX, y);
       pdf.text(String(row.page), 190, y, { align: "right" });
+
       y += 8;
     });
   }
 
-  // ---------------------------------------
-  // SEITE 4 – DTP + KACHELN
-  // ---------------------------------------
   function drawDTPPage() {
     drawHeaderFooter(4);
 
     const marginLeft = 20;
-    const marginRight = 20;
-    const pageWidth = 210;
-    const maxTextWidth = pageWidth - marginLeft - marginRight;
+    const maxTextWidth = 210 - marginLeft - 20;
 
     let y = 20;
     pdf.setFont("helvetica", "bold");
-    pdf.setFontSize(10); // Schriftgröße 10
-    const title =
-      "1\tDigital Trust Platform – Die Grundlage für sichere und effiziente digitale Geschäftsprozesse";
-    const titleLines = pdf.splitTextToSize(title, maxTextWidth);
+    pdf.setFontSize(10);
     pdf.setTextColor(...colors.textDark);
-    pdf.text(titleLines, marginLeft, y);
-    y += titleLines.length * 6 + 4;
+
+    const title = "1\tDigital Trust Platform – Die Grundlage für sichere und effiziente digitale Geschäftsprozesse";
+    pdf.text(pdf.splitTextToSize(title, maxTextWidth), marginLeft, y);
+    y += pdf.splitTextToSize(title, maxTextWidth).length * 6 + 4;
 
     pdf.setFont("helvetica", "normal");
     const paragraph =
       "Die Digital Trust Platform (DTP) verbindet alle zentralen Elemente für ein durchgängig digitales und vertrauenswürdiges Onboarding in einer modular aufgebauten Lösung: von der Identifikation über Bonitäts- und Fraud-Prüfungen bis hin zur elektronischen Signatur – sicher, rechtskonform und effizient. Die Plattform wurde speziell dafür entwickelt, Unternehmen bei der Digitalisierung kritischer Prozesse zu unterstützen, ohne dabei Kompromisse bei Sicherheit, Nutzerfreundlichkeit oder regulatorischer Konformität einzugehen. Sie lässt sich flexibel in bestehende Systemlandschaften integrieren und ermöglicht so individuelle Customer Journeys mit hohem Automatisierungsgrad.";
-    const paraLines = pdf.splitTextToSize(paragraph, maxTextWidth);
-    pdf.text(paraLines, marginLeft, y);
-    y += paraLines.length * 6 + 4;
+
+    pdf.text(pdf.splitTextToSize(paragraph, maxTextWidth), marginLeft, y);
+    y += pdf.splitTextToSize(paragraph, maxTextWidth).length * 6 + 4;
 
     pdf.setFont("helvetica", "bold");
     pdf.text("Kernmodule der DTP sind:", marginLeft, y);
     y += 6;
 
     const bullets = [
-      {
-        title: "Identification",
-        text: "Verschiedene Verfahren wie AutoIdent, VideoIdent oder vor-Ort-Identifikation, je nach regulatorischen Anforderungen.",
-      },
-      {
-        title: "Smart Data",
-        text: "Intelligente Prüfungen wie Bonitätsbewertung (AI Credit Scores), Adressverifikation, Fraud Check und Compliance Screening – nahtlos eingebunden in den Onboarding-Prozess.",
-      },
-      {
-        title: "Signing",
-        text: "Elektronische Signatur mit Unterstützung aller drei Signaturstufen (EES, FES, QES), rechtssicher und benutzerfreundlich.",
-      },
+      { title: "Identification", text: "Verschiedene Verfahren wie AutoIdent, VideoIdent oder vor-Ort-Identifikation, je nach regulatorischen Anforderungen." },
+      { title: "Smart Data", text: "Intelligente Prüfungen wie Bonitätsbewertung (AI Credit Scores), Adressverifikation, Fraud Check und Compliance Screening – nahtlos eingebunden in den Onboarding-Prozess." },
+      { title: "Signing", text: "Elektronische Signatur mit Unterstützung aller drei Signaturstufen (EES, FES, QES), rechtssicher und benutzerfreundlich." },
     ];
 
     bullets.forEach((b) => {
       pdf.setFont("helvetica", "bold");
       pdf.text(`• ${b.title}:`, marginLeft, y);
       pdf.setFont("helvetica", "normal");
-      const lines = pdf.splitTextToSize(b.text, maxTextWidth - 25);
-      pdf.text(lines, marginLeft + 25, y);
-      y += lines.length * 6 + 2;
+      pdf.text(pdf.splitTextToSize(b.text, maxTextWidth - 25), marginLeft + 25, y);
+      y += pdf.splitTextToSize(b.text, maxTextWidth - 25).length * 6 + 2;
     });
-
     y += 5;
 
     const kacheln = [
@@ -219,34 +190,24 @@ export function exportOfferPDF(data) {
       { title: "SIGNING", boxes: ["EES", "FES", "QES", "SIGN"] },
     ];
 
-    const kWidth = 40;
-    const kSpacing = 10;
-    const startX = marginLeft;
-    let kY = y;
+    const widthBox = 40;
+    let xBase = marginLeft;
 
     kacheln.forEach((k, i) => {
-      const x = startX + i * (kWidth + kSpacing);
+      const x = xBase + i * (widthBox + 10);
 
-      // Hintergrund jeder Kachel separat
       pdf.setFillColor(...colors.grayBox);
-      const totalHeight = 12 + k.boxes.length * 12;
-      pdf.rect(x, kY, kWidth, totalHeight, "F");
+      pdf.rect(x, y, widthBox, 12 + k.boxes.length * 12, "F");
 
-      // Titel
       pdf.setFont("helvetica", "bold");
-      pdf.setFontSize(10);
-      pdf.setTextColor(...colors.textDark);
-      pdf.text(k.title, x + 2, kY + 7);
+      pdf.text(k.title, x + 2, y + 7);
 
-      // Kästchen
+      pdf.setFont("helvetica", "normal");
       k.boxes.forEach((b, j) => {
-        const yBox = kY + 12 + j * 12;
-        pdf.setFillColor(...colors.intrumViolet);
-        pdf.rect(x, yBox, kWidth, 10, "F");
-        pdf.setFont("helvetica", "normal");
-        pdf.setFontSize(9);
+        pdf.setFillColor(...colors.intrumPurple);
+        pdf.rect(x, y + 12 + j * 12, widthBox, 10, "F");
         pdf.setTextColor(...colors.textLight);
-        pdf.text(b, x + 2, yBox + 7);
+        pdf.text(b, x + 2, y + 12 + j * 12 + 7);
       });
     });
   }
