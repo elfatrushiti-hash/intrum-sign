@@ -245,22 +245,29 @@ function drawDTPPage() {
   ];
 
   const boxWidth = 40;
-  const gap = 5;
+  const gap = 10;
 
-  // REST API Balken hinter Kachel 1 & 2
+  // Berechne maximale Höhe aller Kacheln für Balken
+  const heights = kacheln.map(k => 10 + k.boxes.length * 9);
+  const maxHeight = Math.max(...heights);
+
+  // Balken hinter allen Kacheln
   const barX = marginLeft;
-  const barY = y + 8 + 0.5 * (Math.max(kacheln[0].boxes.length, kacheln[1].boxes.length) * 9);
-  const barWidth = boxWidth * 2 + gap; // zieht sich über 2 Kacheln
-  const barHeight = 8;
+  const barWidth = kacheln.length * boxWidth + (kacheln.length - 1) * gap;
+  const barY = y + maxHeight / 2 - 7; // Balken Höhe 14
+  const barHeight = 14;
 
   pdf.setFillColor(240, 240, 240); // hellgrau
   pdf.rect(barX, barY, barWidth, barHeight, "F");
 
-  // REST API Text
+  // REST API Text zwischen KUNDE und IDENTIFICATION
+  const restX = marginLeft + boxWidth + gap / 2;
+  const restY = y + maxHeight / 2 - 4;
   pdf.setFont("helvetica", "bold");
-  pdf.setFontSize(9);
+  pdf.setFontSize(10);
   pdf.setTextColor(...colors.textDark);
-  pdf.text("REST API", barX + barWidth / 2, barY + 6, { align: "center" });
+  pdf.text("REST", restX + boxWidth / 2, restY, { align: "center" });
+  pdf.text("API", restX + boxWidth / 2, restY + 6, { align: "center" });
 
   // Kacheln zeichnen
   kacheln.forEach((k, i) => {
