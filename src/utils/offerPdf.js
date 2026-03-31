@@ -5,8 +5,7 @@ export function exportOfferPDF(data) {
   const pdf = new jsPDF({ unit: "mm", format: "a4" });
 
   const colors = {
-    darkViolet: [60, 20, 140], // alle ehemals blauen Elemente jetzt Intrum-Violett
-    intrumViolet: [60, 20, 140],
+    intrumViolet: [60, 20, 140], // Alle ehemals blauen Elemente jetzt Intrum-Violett
     textDark: [0, 0, 0],
     textLight: [255, 255, 255],
     cardBg: [245, 245, 250],
@@ -37,14 +36,8 @@ export function exportOfferPDF(data) {
   // COVER PAGE
   // ---------------------------------------
   function drawCover() {
-    const steps = 100;
-    for (let i = 0; i < steps; i++) {
-      const r = colors.darkViolet[0];
-      const g = colors.darkViolet[1];
-      const b = colors.darkViolet[2];
-      pdf.setFillColor(r, g, b);
-      pdf.rect(0, i * (297 / steps), 210, 297 / steps, "F");
-    }
+    pdf.setFillColor(...colors.intrumViolet);
+    pdf.rect(0, 0, 210, 297, "F");
 
     pdf.setFont("helvetica", "bold");
     pdf.setFontSize(28);
@@ -152,7 +145,7 @@ export function exportOfferPDF(data) {
 
       const textWidth = pdf.getTextWidth(row.title);
       const startX = 20 + textWidth + 2;
-      const endX = 180; // Abstand zur Seitenzahl
+      const endX = 180; // Dynamischer Abstand kurz vor Seitenzahl
       const dotCount = Math.floor((endX - startX) / pdf.getTextWidth("."));
       const dots = ".".repeat(dotCount);
       pdf.text(dots, startX, y);
@@ -174,7 +167,7 @@ export function exportOfferPDF(data) {
 
     let y = 20;
     pdf.setFont("helvetica", "bold");
-    pdf.setFontSize(10);
+    pdf.setFontSize(10); // Schriftgröße 10
     const title =
       "1\tDigital Trust Platform – Die Grundlage für sichere und effiziente digitale Geschäftsprozesse";
     const titleLines = pdf.splitTextToSize(title, maxTextWidth);
