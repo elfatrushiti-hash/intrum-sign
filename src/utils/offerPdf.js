@@ -376,7 +376,7 @@ function drawSigningPage() {
   pdf.setFont("helvetica", "bold");
   pdf.setFontSize(10);
   pdf.text("2.1 EES – Einfache elektronische Signatur", marginLeft, y);
-  y += 8;
+  y += 5;
 
   pdf.setFont("helvetica", "normal");
   pdf.setFontSize(10);
@@ -384,12 +384,12 @@ function drawSigningPage() {
     "Für einfache Vereinbarungen ohne besondere gesetzliche Formvorgaben. Schnell, effizient und ideal für standardisierte Prozesse mit geringem Risiko.";
   const eesLines = pdf.splitTextToSize(eesText, maxTextWidth);
   pdf.text(eesLines, marginLeft, y);
-  y += eesLines.length * 6 + 10;
+  y += eesLines.length * 6 + 5;
 
 // -------------------------
 // Tabelle unter 2.1 EES
 // -------------------------
-y += 10; // Abstand nach dem EES Text
+y += 5; // Abstand nach dem EES Text
 
 const tableMarginLeft = marginLeft;
 const tableWidth = maxTextWidth;
@@ -415,6 +415,11 @@ y += rowHeight;
 pdf.setFillColor(255, 255, 255); // Weiß
 pdf.rect(tableMarginLeft, y, col1Width, rowHeight, "F");
 pdf.rect(tableMarginLeft + col1Width, y, col2Width, rowHeight, "F");
+pdf.setFont("helvetica", "normal");
+pdf.setFontSize(10);
+pdf.setTextColor(...colors.textDark);
+pdf.text("EES – Einfache elektronische Signatur", tableMarginLeft + 2, y + 7);
+pdf.text("0.80", tableMarginLeft + col1Width + 2, y + 7);
 
 y += rowHeight + 10; // Abstand nach unten
   
