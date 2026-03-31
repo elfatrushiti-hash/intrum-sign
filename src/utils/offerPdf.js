@@ -315,21 +315,21 @@ function drawDTPPage() {
   pdf.text("API", restX, restY + 4, { align: "center" });
 
   // --- Text unter Kacheln ---
-  const bottomTextY = Math.min(
-    y + maxHeight + 10,
-    285 // Seitenhöhe minus Margin unten verhindern neue Seite
-  );
+const bottomTextY = y + maxHeight + 10; // Abstand unter Kacheln
 
-  pdf.setFont("helvetica", "normal");
-  pdf.setFontSize(10);
-  pdf.setTextColor(...colors.textDark);
+pdf.setFont("helvetica", "normal");
+pdf.setFontSize(10);
+pdf.setTextColor(...colors.textDark);
 
-  const bottomText =
-    "Ein besonderes Merkmal der DTP ist der hohe Sicherheitsstandard in der Betrugsprävention. So ermöglicht z. B. Device Fingerprinting eine frühzeitige Risikoerkennung anhand technischer Merkmale und schützt bereits vor Abschluss eines Prozesses vor potenziell betrügerischen Zugriffen. Gleichzeitig gewährleistet der Zugriff auf einen breit abgestützten Fraud Pool mit Millionen Transaktionen eine kontinuierliche Risikobewertung auf Basis vernetzter Erkenntnisse." +
-    "Durch die Kombination aus modernster Technologie, regulatorischer Konformität und praxiserprobter Integration bietet die Digital Trust Platform eine zukunftssichere Grundlage für digitale Prozesse mit hoher Akzeptanz bei Endkundinnen und Endkunden – egal ob im Finanzbereich, E-Commerce, Mobilitätssektor oder in der öffentlichen Verwaltung.";
+const bottomText =
+  "Ein besonderes Merkmal der DTP ist der hohe Sicherheitsstandard in der Betrugsprävention. " +
+  "So ermoeglicht z.B. Device Fingerprinting eine fruehzeitige Risikoerkennung anhand technischer Merkmale und schützt bereits vor Abschluss eines Prozesses vor potenziell betrügerischen Zugriffen. " +
+  "Gleichzeitig gewaehrleistet der Zugriff auf einen breit abgestuetzten Fraud Pool mit Millionen Transaktionen eine kontinuierliche Risikobewertung auf Basis vernetzter Erkenntnisse. " +
+  "Durch die Kombination aus modernster Technologie, regulatorischer Konformitaet und praxiserprobter Integration bietet die Digital Trust Platform eine zukunftssichere Grundlage für digitale Prozesse mit hoher Akzeptanz bei Endkundinnen und Endkunden - egal ob im Finanzbereich, E-Commerce, Mobilitätssektor oder in der oeffentlichen Verwaltung.";
 
-  const bottomLines = pdf.splitTextToSize(bottomText, maxTextWidth);
-  pdf.text(bottomLines, marginLeft, bottomTextY);
+const bottomLines = pdf.splitTextToSize(bottomText, maxTextWidth);
+
+pdf.text(bottomLines, marginLeft, bottomTextY);
 }
 // =========================
 // ENDE SEITE 4
