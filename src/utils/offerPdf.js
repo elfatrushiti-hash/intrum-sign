@@ -339,7 +339,7 @@ function drawDTPPage() {
 // ENDE SEITE 4
 // =========================  
 
-  // =========================
+ // =========================
 // SEITE 5 — SIGNING
 // =========================
 function drawSigningPage() {
@@ -347,7 +347,10 @@ function drawSigningPage() {
 
   const marginLeft = 20;
   const marginRight = 20;
-  const maxTextWidth = 210 - marginLeft - marginRight;
+  const pageWidth = 210;
+  const pageHeight = 297;
+  const maxTextWidth = pageWidth - marginLeft - marginRight;
+  const marginBottom = 20;
 
   let y = 20;
 
@@ -355,24 +358,33 @@ function drawSigningPage() {
   pdf.setFont("helvetica", "bold");
   pdf.setFontSize(14);
   pdf.setTextColor(...colors.textDark);
-
   pdf.text("2 SIGNING", marginLeft, y);
+  y += 10;
 
-  y += 8;
-
-  // Einleitungstext
+  // Einleitender Text
   pdf.setFont("helvetica", "normal");
   pdf.setFontSize(10);
-  pdf.setTextColor(...colors.textDark);
-
   const introText =
     "Signing ermöglicht die digitale, medienbruchfreie und rechtskonforme Unterzeichnung von Dokumenten – wahlweise mit einfacher, fortgeschrittener oder qualifizierter elektronischer Signatur. Ideal für effiziente Vertragsabschlüsse im digitalen Raum.";
-
   const introLines = pdf.splitTextToSize(introText, maxTextWidth);
-
   pdf.text(introLines, marginLeft, y);
+  y += introLines.length * 6 + 10;
 
-  y += introLines.length * 6 + 4;
+  // -------------------------
+  // Unterabschnitt 2.1 EES
+  // -------------------------
+  pdf.setFont("helvetica", "bold");
+  pdf.setFontSize(10);
+  pdf.text("2.1 EES – Einfache elektronische Signatur", marginLeft, y);
+  y += 8;
+
+  pdf.setFont("helvetica", "normal");
+  pdf.setFontSize(10);
+  const eesText =
+    "Für einfache Vereinbarungen ohne besondere gesetzliche Formvorgaben. Schnell, effizient und ideal für standardisierte Prozesse mit geringem Risiko.";
+  const eesLines = pdf.splitTextToSize(eesText, maxTextWidth);
+  pdf.text(eesLines, marginLeft, y);
+  y += eesLines.length * 6 + 10;
 }
 // =========================
 // ENDE SEITE 5
