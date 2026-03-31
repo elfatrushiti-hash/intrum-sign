@@ -193,7 +193,7 @@ function drawDTPPage() {
   pdf.setFontSize(10);
 
   const paragraph =
-    "Die Digital Trust Platform (DTP) verbindet alle zentralen Elemente für ein durchgängig digitales und vertrauenswürdiges Onboarding in einer modular aufgebauten Lösung: von der Identifikation über Bonitäts- und Fraud-Prüfungen bis hin zur elektronischen Signatur – sicher, rechtskonform und effizient. Die Plattform wurde speziell dafür entwickelt, Unternehmen bei der Digitalisierung kritischer Prozesse zu unterstützen, ohne dabei Kompromisse bei Sicherheit, Nutzerfreundlichkeit oder regulatorischer Konformität einzugehen. Sie lässt sich flexibel in bestehende Systemlandschaften integrieren und ermöglicht so individuelle Customer Journeys mit hohem Automatisierungsgrad.";
+    "Die Digital Trust Platform (DTP) verbindet alle zentralen Elemente für ein durchgängig digitales und vertrauenswürdiges Onboarding in einer modular aufgebauten Lösung: von der Identifikation über Bonitäts- und Fraud-Prüfungen bis hin zur elektronischen Signatur – sicher, rechtskonform und effizient. Die Plattform wurde speziell dafür entwickelt, Unternehmen bei der Digitalisierung kritischer Prozesse zu unterstützen.";
 
   const paragraphLines = pdf.splitTextToSize(paragraph, maxTextWidth);
   pdf.text(paragraphLines, marginLeft, y);
@@ -213,7 +213,7 @@ function drawDTPPage() {
     {
       title: "Smart Data",
       text:
-        "Intelligente Prüfungen wie Bonitätsbewertung (AI Credit Scores), Adressverifikation, Fraud Check und Compliance Screening – nahtlos eingebunden in den Onboarding-Prozess.",
+        "Intelligente Prüfungen wie Bonitätsbewertung, Adressverifikation, Fraud Check und Compliance Screening – nahtlos im Onboarding-Prozess integriert.",
     },
     {
       title: "Signing",
@@ -243,13 +243,12 @@ function drawDTPPage() {
     { title: "SIGNING", boxes: ["EES", "FES", "QES", "SIGN"] },
   ];
 
-  const widthBox = 30; // kleiner für Seitenränder
+  const widthBox = 30;
   const cardHeight = 8;
   const cardSpacing = 2;
-  const xSpacing = 12; // Abstand zwischen Kacheln
+  const xSpacing = 12;
 
   let xBase = marginLeft;
-
   const maxHeight = Math.max(
     ...kacheln.map((k) => 12 + k.boxes.length * (cardHeight + cardSpacing))
   );
@@ -258,7 +257,7 @@ function drawDTPPage() {
   const barHeight = 10;
   const barY = y + maxHeight / 2 - barHeight / 2;
 
-  pdf.setFillColor(160, 160, 160); // dunkleres Grau
+  pdf.setFillColor(160, 160, 160);
   pdf.rect(
     marginLeft,
     barY,
@@ -306,7 +305,7 @@ function drawDTPPage() {
   const xK2 = xBase + (widthBox + xSpacing);
 
   const restX = xK1 + wK1 + ((xK2 - (xK1 + wK1)) / 2);
-  const restY = barY + 2; // höher auf Balken
+  const restY = barY + 2;
 
   pdf.setFont("helvetica", "bold");
   pdf.setFontSize(8);
@@ -315,27 +314,16 @@ function drawDTPPage() {
   pdf.text("API", restX, restY + 4, { align: "center" });
 
   // --- Text unter Kacheln ---
-  const bottomTextY = y + maxHeight + 10; // Abstand unter Kacheln
+  const bottomTextY = y + maxHeight + 10;
   const bottomText = 
-    "Ein besonderes Merkmal der DTP ist der hohe Sicherheitsstandard in der Betrugsprävention. So ermöglicht z. B. Device Fingerprinting eine frühzeitige Risikoerkennung anhand technischer Merkmale und schützt bereits vor Abschluss eines Prozesses vor potenziell betrügerischen Zugriffen. Gleichzeitig gewährleistet der Zugriff auf einen breit abgestützten Fraud Pool mit Millionen Transaktionen eine kontinuierliche Risikobewertung auf Basis vernetzter Erkenntnisse. " +
-    "Durch die Kombination aus modernster Technologie, regulatorischer Konformität und praxiserprobter Integration bietet die Digital Trust Platform eine zukunftssichere Grundlage für digitale Prozesse mit hoher Akzeptanz bei Endkundinnen und Endkunden – egal ob im Finanzbereich, E-Commerce, Mobilitätssektor oder in der öffentlichen Verwaltung.";
+    "Ein besonderes Merkmal der DTP ist der hohe Sicherheitsstandard in der Betrugsprävention. Device Fingerprinting erkennt frühzeitig Risiken und schützt vor betrügerischen Zugriffen. Zudem ermöglicht der Zugriff auf einen umfangreichen Fraud Pool eine kontinuierliche Risikobewertung. Die Kombination aus Technologie, regulatorischer Konformität und praxiserprobter Integration bietet eine zukunftssichere Grundlage für digitale Prozesse.";
 
   const bottomLines = pdf.splitTextToSize(bottomText, maxTextWidth);
-
-  // Verhindert automatische neue Seite, falls Text zu lang
-  const availableHeight = 287 - bottomTextY;
-  let linesToPrint = bottomLines;
-  const lineHeight = 6;
-
-  if (bottomLines.length * lineHeight > availableHeight) {
-    const maxLines = Math.floor(availableHeight / lineHeight);
-    linesToPrint = bottomLines.slice(0, maxLines);
-  }
 
   pdf.setFont("helvetica", "normal");
   pdf.setFontSize(10);
   pdf.setTextColor(...colors.textDark);
-  pdf.text(linesToPrint, marginLeft, bottomTextY);
+  pdf.text(bottomLines, marginLeft, bottomTextY);
 }
 // =========================
 // ENDE SEITE 4
