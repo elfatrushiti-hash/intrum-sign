@@ -245,10 +245,10 @@ function drawDTPPage() {
     { title: "SIGNING", boxes: ["EES", "FES", "QES", "SIGN"] },
   ];
 
-  const boxWidth = 35; // kleiner, damit Seitenränder eingehalten werden
-  const gap = 8;       // kleiner Abstand zwischen Kacheln
+  const boxWidth = 35; 
+  const gap = 12; // Abstand zwischen KUNDE und IDENTIFICATION größer für REST API
 
-  // Berechne maximale Höhe aller Kacheln für Balken
+  // Berechne maximale Höhe der Kacheln
   const heights = kacheln.map(k => 10 + k.boxes.length * 9);
   const maxHeight = Math.max(...heights);
 
@@ -258,14 +258,14 @@ function drawDTPPage() {
   const barY = y + maxHeight / 2 - 7;
   const barHeight = 14;
 
-  pdf.setFillColor(240, 240, 240); // hellgrau
-  pdf.rect(barX, barY, barWidth, barHeight, "F");
+  pdf.setFillColor(200, 200, 200); // dunklerer Grauton
+  pdf.roundedRect(barX, barY, barWidth, barHeight, 2, 2, "F"); // abgerundete Ecken
 
   // REST API Text zwischen KUNDE und IDENTIFICATION
   const restX = marginLeft + boxWidth + gap / 2;
   const restY = y + maxHeight / 2 - 4;
   pdf.setFont("helvetica", "bold");
-  pdf.setFontSize(8); // kleinere Schrift
+  pdf.setFontSize(8);
   pdf.setTextColor(...colors.textDark);
   pdf.text("REST", restX + boxWidth / 2, restY, { align: "center" });
   pdf.text("API", restX + boxWidth / 2, restY + 4, { align: "center" });
@@ -276,7 +276,7 @@ function drawDTPPage() {
     const height = 10 + k.boxes.length * 9;
 
     pdf.setFillColor(...colors.grayBox);
-    pdf.rect(x, y, boxWidth, height, "F");
+    pdf.roundedRect(x, y, boxWidth, height, 2, 2, "F"); // abgerundet
 
     pdf.setFont("helvetica", "bold");
     pdf.setFontSize(8);
@@ -286,7 +286,7 @@ function drawDTPPage() {
     k.boxes.forEach((b, j) => {
       const yy = y + 8 + j * 9;
       pdf.setFillColor(...colors.intrumPurple);
-      pdf.rect(x + 1, yy, boxWidth - 2, 7, "F");
+      pdf.roundedRect(x + 1, yy, boxWidth - 2, 7, 1, 1, "F"); // abgerundet
 
       pdf.setTextColor(...colors.textLight);
       pdf.text(b, x + 2, yy + 5);
