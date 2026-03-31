@@ -9,10 +9,10 @@ export function exportOfferPDF(data) {
     midViolet: [120, 50, 180],
     lightViolet: [180, 120, 220],
     intrumViolet: [120, 50, 180],
-    textDark: [0, 0, 0],
-    textLight: [255, 255, 255],
-    cardBg: [245, 245, 250],
-    border: [220, 220, 230]
+    textDark: [0,0,0],
+    textLight: [255,255,255],
+    cardBg: [245,245,250],
+    border: [220,220,230]
   };
 
   // ---------------------------------------
@@ -67,11 +67,13 @@ export function exportOfferPDF(data) {
   function drawCompanyPage() {
     drawHeaderFooter(2);
 
+    // Titel Offerte
     pdf.setFont("helvetica","bold");
     pdf.setFontSize(22);
     pdf.setTextColor(...colors.intrumViolet);
     pdf.text("Offerte", 20, 30);
 
+    // Text darunter
     let y = 55;
     pdf.setFont("helvetica","normal");
     pdf.setFontSize(11);
@@ -133,7 +135,8 @@ export function exportOfferPDF(data) {
     pdf.setTextColor(...colors.textDark);
     pdf.text("Inhalt",20,20);
 
-    let y = 40;
+    let y = 35;
+
     const toc = [
       { title: "1  Digital Trust Platform – Überblick", page: "4" },
       { title: "2  SIGNING", page: "5" },
@@ -143,7 +146,7 @@ export function exportOfferPDF(data) {
       { title: "   2.4  Identifikation / seal.ID", page: "5" },
       { title: "3  Setup Gebühren", page: "6" },
       { title: "4  Verschwiegenheitsklausel", page: "6" },
-      { title: "5  Gültigkeit des Angebots", page: "6" },
+      { title: "5  Gültigkeit des Angebots", page: "6" }
     ];
 
     toc.forEach(row => {
@@ -151,108 +154,103 @@ export function exportOfferPDF(data) {
       pdf.setFontSize(10);
       pdf.text(row.title, 20, y);
 
-      // Dynamische gepunktete Linie bis kurz vor Seitenzahl
-      const textWidth = pdf.getTextWidth(row.title) + 22;
-      const lineWidth = 165 - textWidth;
-      const dotCount = Math.floor(lineWidth / 2);
+      // Dotted Line dynamisch vom Ende des Textes bis kurz vor Seitenzahl
+      const textWidth = pdf.getTextWidth(row.title);
+      const lineStartX = 20 + textWidth + 2;
+      const lineEndX = 190 - 10; // Abstand zur Seitenzahl
+      const dotCount = Math.floor((lineEndX - lineStartX)/2);
       const dots = ".".repeat(dotCount);
-      pdf.text(dots, 20 + textWidth, y);
+      pdf.text(dots, lineStartX, y);
 
       pdf.text(row.page, 190, y, {align:"right"});
-      y += 8;
+      y += 10;
     });
   }
 
   // ---------------------------------------
-  // SEITE 4 – DIGITAL TRUST PLATFORM
+  // SEITE 4 – Digital Trust Platform
   // ---------------------------------------
   function drawDTPPage() {
     drawHeaderFooter(4);
 
-    const marginLeft = 20;
-    const marginRight = 190;
-    const maxWidth = marginRight - marginLeft;
-
-    // Titel
     pdf.setFont("helvetica","bold");
     pdf.setFontSize(14);
     pdf.setTextColor(...colors.textDark);
-    const title = "1        Digital Trust Platform – Die Grundlage für sichere und effiziente digitale Geschäftsprozesse";
-    pdf.text(pdf.splitTextToSize(title,maxWidth), marginLeft, 25);
 
-    // Einleitungstext
+    const title = "1\tDigital Trust Platform – Die Grundlage für sichere und effiziente digitale Geschäftsprozesse";
+    pdf.text(title,20,20,{maxWidth:170,lineHeightFactor:1.4});
+
+    let y = 35;
     pdf.setFont("helvetica","normal");
     pdf.setFontSize(10);
-    const paragraph = 
-      "Die Digital Trust Platform (DTP) verbindet alle zentralen Elemente für ein durchgängig digitales und vertrauenswürdiges Onboarding in einer modular aufgebauten Lösung: von der Identifikation über Bonitäts- und Fraud-Prüfungen bis hin zur elektronischen Signatur – sicher, rechtskonform und effizient.\n" +
-      "Die Plattform wurde speziell dafür entwickelt, Unternehmen bei der Digitalisierung kritischer Prozesse zu unterstützen, ohne dabei Kompromisse bei Sicherheit, Nutzerfreundlichkeit oder regulatorischer Konformität einzugehen. Sie lässt sich flexibel in bestehende Systemlandschaften integrieren und ermöglicht so individuelle Customer Journeys mit hohem Automatisierungsgrad.\n" +
-      "Kernmodule der DTP sind:";
-    pdf.setFont("helvetica","bold");
-    pdf.text(pdf.splitTextToSize(paragraph,maxWidth), marginLeft, 40);
 
-    // Bulletpoints
-    const bullets = [
-      {label:"Identification:", text:"Verschiedene Verfahren wie AutoIdent, VideoIdent oder vor-Ort-Identifikation, je nach regulatorischen Anforderungen."},
-      {label:"Smart Data:", text:"Intelligente Prüfungen wie Bonitätsbewertung (AI Credit Scores), Adressverifikation, Fraud Check und Compliance Screening – nahtlos eingebunden in den Onboarding-Prozess."},
-      {label:"Signing:", text:"Elektronische Signatur mit Unterstützung aller drei Signaturstufen (EES, FES, QES), rechtssicher und benutzerfreundlich."}
+    const paragraph = "Die Digital Trust Platform (DTP) verbindet alle zentralen Elemente für ein durchgängig digitales und vertrauenswürdiges Onboarding in einer modular aufgebauten Lösung: von der Identifikation über Bonitäts- und Fraud-Prüfungen bis hin zur elektronischen Signatur – sicher, rechtskonform und effizient. Die Plattform wurde speziell dafür entwickelt, Unternehmen bei der Digitalisierung kritischer Prozesse zu unterstützen, ohne dabei Kompromisse bei Sicherheit, Nutzerfreundlichkeit oder regulatorischer Konformität einzugehen. Sie lässt sich flexibel in bestehende Systemlandschaften integrieren und ermöglicht so individuelle Customer Journeys mit hohem Automatisierungsgrad.";
+    pdf.text(paragraph,20,y,{maxWidth:170,lineHeightFactor:1.4});
+    y += 30;
+
+    pdf.setFont("helvetica","bold");
+    pdf.text("Kernmodule der DTP sind:",20,y);
+    y += 10;
+
+    const bulletPoints = [
+      {title:"Identification",text:"Verschiedene Verfahren wie AutoIdent, VideoIdent oder vor-Ort-Identifikation, je nach regulatorischen Anforderungen."},
+      {title:"Smart Data",text:"Intelligente Prüfungen wie Bonitätsbewertung (AI Credit Scores), Adressverifikation, Fraud Check und Compliance Screening – nahtlos eingebunden in den Onboarding-Prozess."},
+      {title:"Signing",text:"Elektronische Signatur mit Unterstützung aller drei Signaturstufen (EES, FES, QES), rechtssicher und benutzerfreundlich."}
     ];
 
-    let y = 80;
-    bullets.forEach(b => {
-      const bulletX = marginLeft + 2;
-      pdf.circle(bulletX, y-2, 1.5,"F");
+    bulletPoints.forEach(bp=>{
       pdf.setFont("helvetica","bold");
-      pdf.text(b.label, marginLeft + 6, y);
+      pdf.text("• "+bp.title+":",20,y);
+      const textX = 20 + pdf.getTextWidth("• "+bp.title+":") + 5;
       pdf.setFont("helvetica","normal");
-      const bulletTextX = marginLeft + 6 + pdf.getTextWidth(b.label) + 2;
-      pdf.text(pdf.splitTextToSize(b.text,maxWidth - (bulletTextX - marginLeft)), bulletTextX, y);
-      y += 12 + pdf.getTextDimensions(b.text).h; 
+      pdf.text(bp.text,textX,y,{maxWidth:170-(textX-20),lineHeightFactor:1.3});
+      y += 15;
     });
 
-    // Kacheln – nebeneinander
-    const kacheln = [
-      {title:"Kunde", items:["Self-Onboarding","CRM","Interne Applikation","Externe Applikation"]},
-      {title:"IDENTIFICATION", items:["AutoIdent","VideoIdent","OnlineIdent","QES-Ident (seal.ID)","BankIdent (ab 2026)"]},
-      {title:"SMART DATA", items:["Credit Scores","Data Reports","Address","Fraud","Compliance","ZEK/IKO/KREMO"]},
-      {title:"SIGNING", items:["EES","FES","QES","SIGN"]}
+    y += 5;
+
+    // 4 Kacheln – Beispielgrafik mit Hintergrund
+    const tiles = [
+      {title:"Kunde",cards:["Self-Onboarding","CRM","Interne Applikation","Externe Applikation"]},
+      {title:"IDENTIFICATION",cards:["AutoIdent","VideoIdent","OnlineIdent","QES-Ident (seal.ID)","BankIdent (ab 2026)"]},
+      {title:"SMART DATA",cards:["Credit Scores","Data Reports","Address","Fraud","Compliance","ZEK/IKO/KREMO"]},
+      {title:"SIGNING",cards:["EES","FES","QES","SIGN"]}
     ];
 
-    const startX = marginLeft;
-    const startY = y + 10;
-    const kachelSpacing = 5;
+    let startX = 20;
+    const tileWidth = 40;
+    const tileGap = 10;
+    let tileY = y;
 
-    // Breite dynamisch
-    const totalSpace = 170 - (kacheln.length -1)*kachelSpacing;
-    const kachelWidth = totalSpace / kacheln.length;
-    let currentX = startX;
+    tiles.forEach(tile=>{
+      // Kachel Hintergrund
+      pdf.setFillColor(245,245,245);
+      pdf.rect(startX,tileY,tileWidth,10 + tile.cards.length*12,"F");
 
-    kacheln.forEach(k => {
-      // Hintergrund leicht grau
-      pdf.setFillColor(240,240,240);
-      pdf.rect(currentX, startY, kachelWidth, 10 + k.items.length*10, "F");
-
-      // Titel fett
+      // Titel
       pdf.setFont("helvetica","bold");
       pdf.setFontSize(10);
       pdf.setTextColor(...colors.textDark);
-      pdf.text(k.title,currentX + 2, startY + 7);
+      pdf.text(tile.title,startX+3,tileY+7);
 
-      // Items
-      pdf.setFont("helvetica","normal");
-      pdf.setFontSize(10);
-      pdf.setTextColor(...colors.textLight);
-      k.items.forEach((item,i)=>{
+      // Cards
+      tile.cards.forEach((card,i)=>{
+        const cy = tileY + 12 + i*12;
         pdf.setFillColor(...colors.intrumViolet);
-        pdf.rect(currentX, startY + 10 + i*10, kachelWidth, 8,"F");
-        pdf.text(item, currentX + 2, startY + 16 + i*10);
+        pdf.rect(startX,cy,tileWidth,10,"F");
+
+        pdf.setFont("helvetica","normal");
+        pdf.setFontSize(9);
+        pdf.setTextColor(255,255,255);
+        pdf.text(card,startX+2,cy+7);
       });
 
-      currentX += kachelWidth + kachelSpacing;
+      startX += tileWidth + tileGap;
     });
   }
 
   // ---------------------------------------
-  // GENERIERUNG
+  // PDF erzeugen
   // ---------------------------------------
   drawCover();
   pdf.addPage();
