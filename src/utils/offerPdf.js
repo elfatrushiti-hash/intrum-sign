@@ -174,7 +174,8 @@ function drawDTPPage() {
 
   const marginLeft = 20;
   const marginRight = 20;
-  const maxTextWidth = 210 - marginLeft - marginRight;
+  const pageWidth = 210;
+  const maxTextWidth = pageWidth - marginLeft - marginRight;
 
   let y = 20;
 
@@ -203,21 +204,9 @@ function drawDTPPage() {
   y += 5;
 
   const bullets = [
-    {
-      title: "Identification",
-      text:
-        "Verschiedene Verfahren wie AutoIdent, VideoIdent oder vor-Ort-Identifikation, je nach regulatorischen Anforderungen.",
-    },
-    {
-      title: "Smart Data",
-      text:
-        "Intelligente Prüfungen wie Bonitätsbewertung (AI Credit Scores), Adressverifikation, Fraud Check und Compliance Screening – nahtlos eingebunden in den Onboarding-Prozess.",
-    },
-    {
-      title: "Signing",
-      text:
-        "Elektronische Signatur mit Unterstützung aller drei Signaturstufen (EES, FES, QES), rechtssicher und benutzerfreundlich.",
-    },
+    { title: "Identification", text: "Verschiedene Verfahren wie AutoIdent, VideoIdent oder vor-Ort-Identifikation, je nach regulatorischen Anforderungen." },
+    { title: "Smart Data", text: "Intelligente Prüfungen wie Bonitätsbewertung (AI Credit Scores), Adressverifikation, Fraud Check und Compliance Screening – nahtlos eingebunden in den Onboarding-Prozess." },
+    { title: "Signing", text: "Elektronische Signatur mit Unterstützung aller drei Signaturstufen (EES, FES, QES), rechtssicher und benutzerfreundlich." },
   ];
 
   bullets.forEach((b) => {
@@ -231,7 +220,7 @@ function drawDTPPage() {
     y += lines.length * 5 + 2;
   });
 
-  y += 4;
+  y += 5;
 
   // Kacheln
   const kacheln = [
@@ -242,22 +231,22 @@ function drawDTPPage() {
   ];
 
   const boxWidth = 35;
-  const gapRest = 35; // Abstand Kachel1↔2 für REST API
-  const gapNormal = 10; // Abstand andere Kacheln
+  const gapNormal = 10;
+  const gapRest = 25; // extra Abstand für REST API
   const heights = kacheln.map(k => 8 + k.boxes.length * 9);
   const maxHeight = Math.max(...heights);
 
-  // Balken Hintergrund (mittig)
+  // Balken Hintergrund (leicht grau)
   const barX = marginLeft;
-  const barWidth = boxWidth * kacheln.length + gapRest + 2 * gapNormal;
+  const barWidth = boxWidth * 4 + gapNormal * 2 + gapRest;
   const barY = y + maxHeight / 2 - 7;
   const barHeight = 14;
-  pdf.setFillColor(180, 180, 180); // etwas dunkleres Grau
+  pdf.setFillColor(200, 200, 200); // hellgrau
   pdf.roundedRect(barX, barY, barWidth, barHeight, 2, 2, "F");
 
-  // REST API Text **in den Vordergrund**
+  // REST API Text im Vordergrund
   const restX = marginLeft + boxWidth + gapRest / 2 + boxWidth / 2;
-  const restY = barY + barHeight / 2 - 4; // mittig Balken
+  const restY = barY + 3;
   pdf.setFont("helvetica", "bold");
   pdf.setFontSize(8);
   pdf.setTextColor(...colors.textDark);
