@@ -359,7 +359,7 @@ function drawSigningPage() {
   pdf.setFontSize(14);
   pdf.setTextColor(...colors.textDark);
   pdf.text("2 SIGNING", marginLeft, y);
-  y += 5;
+  y -= 5;
 
   // Einleitender Text
   pdf.setFont("helvetica", "normal");
@@ -368,7 +368,7 @@ function drawSigningPage() {
     "Signing ermöglicht die digitale, medienbruchfreie und rechtskonforme Unterzeichnung von Dokumenten – wahlweise mit einfacher, fortgeschrittener oder qualifizierter elektronischer Signatur. Ideal für effiziente Vertragsabschlüsse im digitalen Raum.";
   const introLines = pdf.splitTextToSize(introText, maxTextWidth);
   pdf.text(introLines, marginLeft, y);
-  y += introLines.length * 6 + 10;
+  y -= introLines.length * 6 + 10;
 
   // -------------------------
   // Unterabschnitt 2.1 EES
@@ -376,7 +376,7 @@ function drawSigningPage() {
   pdf.setFont("helvetica", "bold");
   pdf.setFontSize(10);
   pdf.text("2.1 EES – Einfache elektronische Signatur", marginLeft, y);
-  y += 5;
+  y -= 5;
 
   pdf.setFont("helvetica", "normal");
   pdf.setFontSize(10);
@@ -384,12 +384,12 @@ function drawSigningPage() {
     "Für einfache Vereinbarungen ohne besondere gesetzliche Formvorgaben. Schnell, effizient und ideal für standardisierte Prozesse mit geringem Risiko.";
   const eesLines = pdf.splitTextToSize(eesText, maxTextWidth);
   pdf.text(eesLines, marginLeft, y);
-  y += eesLines.length * 6 + 5;
+  y -= eesLines.length * 6 + 5;
 
 // -------------------------
 // Tabelle unter 2.1 EES
 // -------------------------
-y += 5; // Abstand nach dem EES Text
+y -= 5; // Abstand nach dem EES Text
 
 const tableMarginLeft = marginLeft;
 const tableWidth = maxTextWidth;
