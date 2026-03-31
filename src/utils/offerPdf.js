@@ -177,43 +177,66 @@ function drawDTPPage() {
   const maxTextWidth = 210 - marginLeft - marginRight;
 
   let y = 20;
+
+  // Titel
   pdf.setFont("helvetica", "bold");
   pdf.setFontSize(14);
   pdf.setTextColor(...colors.textDark);
 
-  const title = "1\tDigital Trust Platform – Die Grundlage für sichere und effiziente digitale Geschäftsprozesse";
+  const title =
+    "1 Digital Trust Platform – Die Grundlage für sichere und effiziente digitale Geschäftsprozesse";
   const titleLines = pdf.splitTextToSize(title, maxTextWidth);
   pdf.text(titleLines, marginLeft, y);
   y += titleLines.length * 6 + 4;
 
+  // Text
   pdf.setFont("helvetica", "normal");
   pdf.setFontSize(10);
+
   const paragraph =
     "Die Digital Trust Platform (DTP) verbindet alle zentralen Elemente für ein durchgängig digitales und vertrauenswürdiges Onboarding in einer modular aufgebauten Lösung: von der Identifikation über Bonitäts- und Fraud-Prüfungen bis hin zur elektronischen Signatur – sicher, rechtskonform und effizient. Die Plattform wurde speziell dafür entwickelt, Unternehmen bei der Digitalisierung kritischer Prozesse zu unterstützen, ohne dabei Kompromisse bei Sicherheit, Nutzerfreundlichkeit oder regulatorischer Konformität einzugehen. Sie lässt sich flexibel in bestehende Systemlandschaften integrieren und ermöglicht so individuelle Customer Journeys mit hohem Automatisierungsgrad.";
+
   const paragraphLines = pdf.splitTextToSize(paragraph, maxTextWidth);
   pdf.text(paragraphLines, marginLeft, y);
   y += paragraphLines.length * 6 + 4;
 
+  // Bullet Titel
   pdf.setFont("helvetica", "bold");
   pdf.text("Kernmodule der DTP sind:", marginLeft, y);
   y += 6;
 
   const bullets = [
-    { title: "Identification", text: "Verschiedene Verfahren wie AutoIdent, VideoIdent oder vor-Ort-Identifikation, je nach regulatorischen Anforderungen." },
-    { title: "Smart Data", text: "Intelligente Prüfungen wie Bonitätsbewertung (AI Credit Scores), Adressverifikation, Fraud Check und Compliance Screening – nahtlos eingebunden in den Onboarding-Prozess." },
-    { title: "Signing", text: "Elektronische Signatur mit Unterstützung aller drei Signaturstufen (EES, FES, QES), rechtssicher und benutzerfreundlich." },
+    {
+      title: "Identification",
+      text:
+        "Verschiedene Verfahren wie AutoIdent, VideoIdent oder vor-Ort-Identifikation, je nach regulatorischen Anforderungen.",
+    },
+    {
+      title: "Smart Data",
+      text:
+        "Intelligente Prüfungen wie Bonitätsbewertung (AI Credit Scores), Adressverifikation, Fraud Check und Compliance Screening – nahtlos eingebunden in den Onboarding-Prozess.",
+    },
+    {
+      title: "Signing",
+      text:
+        "Elektronische Signatur mit Unterstützung aller drei Signaturstufen (EES, FES, QES), rechtssicher und benutzerfreundlich.",
+    },
   ];
 
   bullets.forEach((b) => {
     pdf.setFont("helvetica", "bold");
     pdf.text(`• ${b.title}:`, marginLeft, y);
+
     pdf.setFont("helvetica", "normal");
-    pdf.text(pdf.splitTextToSize(b.text, maxTextWidth - 25), marginLeft + 25, y);
-    y += pdf.splitTextToSize(b.text, maxTextWidth - 25).length * 6 + 2;
+    const lines = pdf.splitTextToSize(b.text, maxTextWidth - 25);
+    pdf.text(lines, marginLeft + 25, y);
+
+    y += lines.length * 6 + 2;
   });
+
   y += 5;
 
-  // --- Kacheln ---
+  // Kacheln
   const kacheln = [
     { title: "Kunde", boxes: ["Self-Onboarding", "CRM", "Interne Applikation", "Externe Applikation"] },
     { title: "IDENTIFICATION", boxes: ["AutoIdent", "VideoIdent", "OnlineIdent", "QES-Ident (seal.ID)", "BankIdent (ab 2026)"] },
@@ -221,50 +244,70 @@ function drawDTPPage() {
     { title: "SIGNING", boxes: ["EES", "FES", "QES", "SIGN"] },
   ];
 
-  const widthBox = 35; // kleinere Kacheln
-  const cardHeight = 8; // kleinere Kartenhöhe
-  const xSpacing = 10; // Abstand zwischen Kacheln
+  const widthBox = 35;
+  const cardHeight = 8;
+  const cardSpacing = 2;
+  const xSpacing = 10;
+
   let xBase = marginLeft;
 
-  // Balken Höhe und Position
-  const maxHeight = Math.max(...kacheln.map(k => 12 + k.boxes.length * cardHeight));
+  const maxHeight = Math.max(
+    ...kacheln.map((k) => 12 + k.boxes.length * (cardHeight + cardSpacing))
+  );
+
+  // Balken
   const barHeight = 10;
   const barY = y + maxHeight / 2 - barHeight / 2;
-  pdf.setFillColor(180, 180, 180); // etwas dunkler
-  pdf.rect(marginLeft, barY, kacheln.length * (widthBox + xSpacing) - xSpacing, barHeight, "F");
+
+  pdf.setFillColor(180, 180, 180);
+  pdf.rect(
+    marginLeft,
+    barY,
+    kacheln.length * (widthBox + xSpacing) - xSpacing,
+    barHeight,
+    "F"
+  );
 
   // Kacheln zeichnen
   kacheln.forEach((k, i) => {
     const x = xBase + i * (widthBox + xSpacing);
 
-    // Kachel Hintergrund
     pdf.setFillColor(...colors.grayBox);
-    pdf.roundedRect(x, y, widthBox, 12 + k.boxes.length * cardHeight, 2, 2, "F");
+    pdf.roundedRect(
+      x,
+      y,
+      widthBox,
+      12 + k.boxes.length * (cardHeight + cardSpacing),
+      2,
+      2,
+      "F"
+    );
 
-    // Kachel Titel
     pdf.setFont("helvetica", "bold");
     pdf.setFontSize(8);
     pdf.setTextColor(...colors.textDark);
     pdf.text(k.title, x + 2, y + 7);
 
-    // Karten
     k.boxes.forEach((b, j) => {
+      const yy = y + 12 + j * (cardHeight + cardSpacing);
+
       pdf.setFillColor(...colors.intrumPurple);
-      pdf.roundedRect(x, y + 12 + j * cardHeight, widthBox, cardHeight, 2, 2, "F");
+      pdf.roundedRect(x, yy, widthBox, cardHeight, 2, 2, "F");
+
       pdf.setFont("helvetica", "normal");
       pdf.setFontSize(8);
       pdf.setTextColor(...colors.textLight);
-      pdf.text(b, x + 2, y + 12 + j * cardHeight + 5); // vertikal mittig
+      pdf.text(b, x + 2, yy + 5);
     });
   });
 
-  // REST API Text
-  const k1 = kacheln[0];
+  // REST API
   const xK1 = xBase;
   const wK1 = widthBox;
   const xK2 = xBase + (widthBox + xSpacing);
+
   const restX = xK1 + wK1 + ((xK2 - (xK1 + wK1)) / 2);
-  const restY = barY + barHeight / 2 + 2; // vertikal mittig auf Balken
+  const restY = barY + 3;
 
   pdf.setFont("helvetica", "bold");
   pdf.setFontSize(8);
