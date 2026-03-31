@@ -173,7 +173,8 @@ function drawDTPPage() {
   drawHeaderFooter(4);
 
   const marginLeft = 20;
-  const maxTextWidth = 210 - marginLeft - 20;
+  const marginRight = 20;
+  const maxTextWidth = 210 - marginLeft - marginRight;
 
   let y = 20;
   pdf.setFont("helvetica", "bold");
@@ -212,7 +213,7 @@ function drawDTPPage() {
   });
   y += 5;
 
-  // --- Kacheln & Balken ---
+  // --- Kacheln ---
   const kacheln = [
     { title: "Kunde", boxes: ["Self-Onboarding", "CRM", "Interne Applikation", "Externe Applikation"] },
     { title: "IDENTIFICATION", boxes: ["AutoIdent", "VideoIdent", "OnlineIdent", "QES-Ident (seal.ID)", "BankIdent (ab 2026)"] },
@@ -220,52 +221,50 @@ function drawDTPPage() {
     { title: "SIGNING", boxes: ["EES", "FES", "QES", "SIGN"] },
   ];
 
-  const widthBox = 40;
-  const heightBoxBase = 12; // Höhe der Überschrift + Karten pro Box
+  const widthBox = 35; // kleinere Kacheln
+  const cardHeight = 8; // kleinere Kartenhöhe
+  const xSpacing = 10; // Abstand zwischen Kacheln
   let xBase = marginLeft;
 
-  // Berechne maximale Höhe aller Kacheln, um Balkenhöhe zu bestimmen
-  let maxHeight = 0;
-  kacheln.forEach(k => {
-    const h = 12 + k.boxes.length * 12;
-    if (h > maxHeight) maxHeight = h;
-  });
-
-  // Balken
+  // Balken Höhe und Position
+  const maxHeight = Math.max(...kacheln.map(k => 12 + k.boxes.length * cardHeight));
   const barHeight = 10;
   const barY = y + maxHeight / 2 - barHeight / 2;
-  pdf.setFillColor(200, 200, 200); // hellgrau
-  pdf.rect(marginLeft, barY, kacheln.length * (widthBox + 10) - 10, barHeight, "F"); // über alle Kacheln
+  pdf.setFillColor(180, 180, 180); // etwas dunkler
+  pdf.rect(marginLeft, barY, kacheln.length * (widthBox + xSpacing) - xSpacing, barHeight, "F");
 
-  // Kacheln
+  // Kacheln zeichnen
   kacheln.forEach((k, i) => {
-    const x = xBase + i * (widthBox + 10);
+    const x = xBase + i * (widthBox + xSpacing);
 
+    // Kachel Hintergrund
     pdf.setFillColor(...colors.grayBox);
-    pdf.roundedRect(x, y, widthBox, heightBoxBase + k.boxes.length * 12, 2, 2, "F"); // abgerundete Kacheln
+    pdf.roundedRect(x, y, widthBox, 12 + k.boxes.length * cardHeight, 2, 2, "F");
 
+    // Kachel Titel
     pdf.setFont("helvetica", "bold");
     pdf.setFontSize(8);
     pdf.setTextColor(...colors.textDark);
     pdf.text(k.title, x + 2, y + 7);
 
+    // Karten
     k.boxes.forEach((b, j) => {
       pdf.setFillColor(...colors.intrumPurple);
-      pdf.roundedRect(x, y + 12 + j * 12, widthBox, 10, 2, 2, "F"); // abgerundete Karten
+      pdf.roundedRect(x, y + 12 + j * cardHeight, widthBox, cardHeight, 2, 2, "F");
       pdf.setFont("helvetica", "normal");
       pdf.setFontSize(8);
       pdf.setTextColor(...colors.textLight);
-      pdf.text(b, x + 2, y + 12 + j * 12 + 7);
+      pdf.text(b, x + 2, y + 12 + j * cardHeight + 5); // vertikal mittig
     });
   });
 
-  // REST API Text: genau zwischen Kachel 1 und Kachel 2, mittig auf Balken
+  // REST API Text
   const k1 = kacheln[0];
   const xK1 = xBase;
   const wK1 = widthBox;
-  const xK2 = xBase + (widthBox + 10); // Start Kachel 2
-  const restX = xK1 + wK1 + ((xK2 - (xK1 + wK1)) / 2); // Mitte zwischen K1 und K2
-  const restY = barY + 7; // Vertikal mittig auf Balken
+  const xK2 = xBase + (widthBox + xSpacing);
+  const restX = xK1 + wK1 + ((xK2 - (xK1 + wK1)) / 2);
+  const restY = barY + barHeight / 2 + 2; // vertikal mittig auf Balken
 
   pdf.setFont("helvetica", "bold");
   pdf.setFontSize(8);
