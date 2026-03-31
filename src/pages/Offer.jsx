@@ -344,9 +344,9 @@ export default function Offer() {
               let price = null;
 
               if (volume === 0) price = null;
-              else if (volume <= 2500) price = 19.20;
-              else if (volume <= 5000) price = 17.20;
-              else if (volume <= 10000) price = 15.20;
+              else if (volume <= 2500) price = 17.00;
+              else if (volume <= 5000) price = 16.00;
+              else if (volume <= 10000) price = 15.00;
               else price = "Nach Vereinbarung";
 
               setOfferData((prev) => ({
