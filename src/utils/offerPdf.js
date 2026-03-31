@@ -173,6 +173,8 @@ function drawDTPPage() {
 
   const marginLeft = 20;
   const marginRight = 20;
+  const marginBottom = 15;
+  const pageHeight = 297;
   const maxTextWidth = 210 - marginLeft - marginRight;
 
   let y = 20;
@@ -193,7 +195,7 @@ function drawDTPPage() {
   pdf.setFontSize(10);
 
   const paragraph =
-    "Die Digital Trust Platform (DTP) verbindet alle zentralen Elemente für ein durchgängig digitales und vertrauenswürdiges Onboarding in einer modular aufgebauten Lösung: von der Identifikation über Bonitäts- und Fraud-Prüfungen bis hin zur elektronischen Signatur – sicher, rechtskonform und effizient. Die Plattform wurde speziell dafür entwickelt, Unternehmen bei der Digitalisierung kritischer Prozesse zu unterstützen.";
+    "Die Digital Trust Platform (DTP) verbindet alle zentralen Elemente für ein durchgängig digitales und vertrauenswürdiges Onboarding: von der Identifikation über Bonitäts- und Fraud-Prüfungen bis hin zur elektronischen Signatur – sicher, rechtskonform und effizient.";
 
   const paragraphLines = pdf.splitTextToSize(paragraph, maxTextWidth);
   pdf.text(paragraphLines, marginLeft, y);
@@ -315,15 +317,20 @@ function drawDTPPage() {
 
   // --- Text unter Kacheln ---
   const bottomTextY = y + maxHeight + 10;
-  const bottomText = 
-    "Ein besonderes Merkmal der DTP ist der hohe Sicherheitsstandard in der Betrugsprävention. Device Fingerprinting erkennt frühzeitig Risiken und schützt vor betrügerischen Zugriffen. Zudem ermöglicht der Zugriff auf einen umfangreichen Fraud Pool eine kontinuierliche Risikobewertung. Die Kombination aus Technologie, regulatorischer Konformität und praxiserprobter Integration bietet eine zukunftssichere Grundlage für digitale Prozesse.";
+  const maxBottomY = pageHeight - marginBottom;
+  const bottomText =
+    "Ein besonderes Merkmal der DTP ist der hohe Sicherheitsstandard in der Betrugsprävention. Device Fingerprinting erkennt frühzeitig Risiken und schützt vor betrügerischen Zugriffen. Zugriff auf den Fraud Pool ermöglicht eine kontinuierliche Risikobewertung. Modernste Technologie, regulatorische Konformität und praxiserprobte Integration bieten eine sichere Grundlage für digitale Prozesse.";
 
   const bottomLines = pdf.splitTextToSize(bottomText, maxTextWidth);
 
-  pdf.setFont("helvetica", "normal");
-  pdf.setFontSize(10);
-  pdf.setTextColor(...colors.textDark);
-  pdf.text(bottomLines, marginLeft, bottomTextY);
+  // Prüfen, ob Text noch auf die Seite passt, sonst kürzen
+  let totalHeight = bottomLines.length * 6;
+  if (bottomTextY + totalHeight > maxBottomY) {
+    const allowedLines = Math.floor((maxBottomY - bottomTextY) / 6);
+    pdf.text(bottomLines.slice(0, allowedLines), marginLeft, bottomTextY);
+  } else {
+    pdf.text(bottomLines, marginLeft, bottomTextY);
+  }
 }
 // =========================
 // ENDE SEITE 4
