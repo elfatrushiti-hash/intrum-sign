@@ -173,35 +173,29 @@ function drawDTPPage() {
   drawHeaderFooter(4);
 
   const marginLeft = 20;
-  const marginRight = 20;
-  const pageWidth = 210;
-  const maxTextWidth = pageWidth - marginLeft - marginRight;
+  const maxTextWidth = 210 - marginLeft - 20;
 
   let y = 20;
-
-  // Titel
   pdf.setFont("helvetica", "bold");
   pdf.setFontSize(14);
   pdf.setTextColor(...colors.textDark);
-  const title =
-    "1 Digital Trust Platform – Die Grundlage für sichere und effiziente digitale Geschäftsprozesse";
+
+  const title = "1\tDigital Trust Platform – Die Grundlage für sichere und effiziente digitale Geschäftsprozesse";
   const titleLines = pdf.splitTextToSize(title, maxTextWidth);
   pdf.text(titleLines, marginLeft, y);
-  y += titleLines.length * 6 + 3;
+  y += titleLines.length * 6 + 4;
 
-  // Beschreibung
   pdf.setFont("helvetica", "normal");
   pdf.setFontSize(10);
   const paragraph =
     "Die Digital Trust Platform (DTP) verbindet alle zentralen Elemente für ein durchgängig digitales und vertrauenswürdiges Onboarding in einer modular aufgebauten Lösung: von der Identifikation über Bonitäts- und Fraud-Prüfungen bis hin zur elektronischen Signatur – sicher, rechtskonform und effizient. Die Plattform wurde speziell dafür entwickelt, Unternehmen bei der Digitalisierung kritischer Prozesse zu unterstützen, ohne dabei Kompromisse bei Sicherheit, Nutzerfreundlichkeit oder regulatorischer Konformität einzugehen. Sie lässt sich flexibel in bestehende Systemlandschaften integrieren und ermöglicht so individuelle Customer Journeys mit hohem Automatisierungsgrad.";
-  const textLines = pdf.splitTextToSize(paragraph, maxTextWidth);
-  pdf.text(textLines, marginLeft, y);
-  y += textLines.length * 5 + 3;
+  const paragraphLines = pdf.splitTextToSize(paragraph, maxTextWidth);
+  pdf.text(paragraphLines, marginLeft, y);
+  y += paragraphLines.length * 6 + 4;
 
-  // Bulletpunkte
   pdf.setFont("helvetica", "bold");
   pdf.text("Kernmodule der DTP sind:", marginLeft, y);
-  y += 5;
+  y += 6;
 
   const bullets = [
     { title: "Identification", text: "Verschiedene Verfahren wie AutoIdent, VideoIdent oder vor-Ort-Identifikation, je nach regulatorischen Anforderungen." },
@@ -211,18 +205,14 @@ function drawDTPPage() {
 
   bullets.forEach((b) => {
     pdf.setFont("helvetica", "bold");
-    pdf.text("•", marginLeft, y);
-    pdf.text(`${b.title}:`, marginLeft + 4, y);
-
+    pdf.text(`• ${b.title}:`, marginLeft, y);
     pdf.setFont("helvetica", "normal");
-    const lines = pdf.splitTextToSize(b.text, maxTextWidth - 30);
-    pdf.text(lines, marginLeft + 30, y);
-    y += lines.length * 5 + 2;
+    pdf.text(pdf.splitTextToSize(b.text, maxTextWidth - 25), marginLeft + 25, y);
+    y += pdf.splitTextToSize(b.text, maxTextWidth - 25).length * 6 + 2;
   });
-
   y += 5;
 
-  // Kacheln
+  // --- Kacheln & Balken ---
   const kacheln = [
     { title: "Kunde", boxes: ["Self-Onboarding", "CRM", "Interne Applikation", "Externe Applikation"] },
     { title: "IDENTIFICATION", boxes: ["AutoIdent", "VideoIdent", "OnlineIdent", "QES-Ident (seal.ID)", "BankIdent (ab 2026)"] },
@@ -230,60 +220,58 @@ function drawDTPPage() {
     { title: "SIGNING", boxes: ["EES", "FES", "QES", "SIGN"] },
   ];
 
-  const boxWidth = 35;
-  const gapNormal = 10;
-  const gapRest = 25; // extra Abstand für REST API
-  const heights = kacheln.map(k => 8 + k.boxes.length * 9);
-  const maxHeight = Math.max(...heights);
+  const widthBox = 40;
+  const heightBoxBase = 12; // Höhe der Überschrift + Karten pro Box
+  let xBase = marginLeft;
 
-  // Balken Hintergrund (leicht grau)
-  const barX = marginLeft;
-  const barWidth = boxWidth * 4 + gapNormal * 2 + gapRest;
-  const barY = y + maxHeight / 2 - 7;
-  const barHeight = 14;
+  // Berechne maximale Höhe aller Kacheln, um Balkenhöhe zu bestimmen
+  let maxHeight = 0;
+  kacheln.forEach(k => {
+    const h = 12 + k.boxes.length * 12;
+    if (h > maxHeight) maxHeight = h;
+  });
+
+  // Balken
+  const barHeight = 10;
+  const barY = y + maxHeight / 2 - barHeight / 2;
   pdf.setFillColor(200, 200, 200); // hellgrau
-  pdf.roundedRect(barX, barY, barWidth, barHeight, 2, 2, "F");
+  pdf.rect(marginLeft, barY, kacheln.length * (widthBox + 10) - 10, barHeight, "F"); // über alle Kacheln
 
-  // REST API Text im Vordergrund
-// REST API Text im Vordergrund, direkt nach Kachel 1
-const restX = marginLeft + boxWidth / 2; // direkt nach Kachel 1
-const restY = barY + 3;
-pdf.setFont("helvetica", "bold");
-pdf.setFontSize(8);
-pdf.setTextColor(...colors.textDark);
-pdf.text("REST", restX, restY, { align: "center" });
-pdf.text("API", restX, restY + 4, { align: "center" });
-
-  // Kacheln links/rechts vom REST API
+  // Kacheln
   kacheln.forEach((k, i) => {
-    let x;
-    if (i === 0) x = marginLeft;
-    else if (i === 1) x = marginLeft + boxWidth + gapRest;
-    else if (i === 2) x = marginLeft + boxWidth + gapRest + (i - 1) * (boxWidth + gapNormal);
-    else x = marginLeft + boxWidth + gapRest + (i - 1) * (boxWidth + gapNormal);
+    const x = xBase + i * (widthBox + 10);
 
-    const height = 8 + k.boxes.length * 9;
-
-    // Kachel Hintergrund
     pdf.setFillColor(...colors.grayBox);
-    pdf.roundedRect(x, y, boxWidth, height, 2, 2, "F");
+    pdf.roundedRect(x, y, widthBox, heightBoxBase + k.boxes.length * 12, 2, 2, "F"); // abgerundete Kacheln
 
-    // Titel Kachel
     pdf.setFont("helvetica", "bold");
     pdf.setFontSize(8);
     pdf.setTextColor(...colors.textDark);
-    pdf.text(k.title, x + 2, y + 6);
+    pdf.text(k.title, x + 2, y + 7);
 
-    // Cards in Kachel
     k.boxes.forEach((b, j) => {
-      const yy = y + 8 + j * 9;
       pdf.setFillColor(...colors.intrumPurple);
-      pdf.roundedRect(x + 1, yy, boxWidth - 2, 7, 1, 1, "F");
-
+      pdf.roundedRect(x, y + 12 + j * 12, widthBox, 10, 2, 2, "F"); // abgerundete Karten
+      pdf.setFont("helvetica", "normal");
+      pdf.setFontSize(8);
       pdf.setTextColor(...colors.textLight);
-      pdf.text(b, x + 2, yy + 5);
+      pdf.text(b, x + 2, y + 12 + j * 12 + 7);
     });
   });
+
+  // REST API Text: genau zwischen Kachel 1 und Kachel 2, mittig auf Balken
+  const k1 = kacheln[0];
+  const xK1 = xBase;
+  const wK1 = widthBox;
+  const xK2 = xBase + (widthBox + 10); // Start Kachel 2
+  const restX = xK1 + wK1 + ((xK2 - (xK1 + wK1)) / 2); // Mitte zwischen K1 und K2
+  const restY = barY + 7; // Vertikal mittig auf Balken
+
+  pdf.setFont("helvetica", "bold");
+  pdf.setFontSize(8);
+  pdf.setTextColor(...colors.textDark);
+  pdf.text("REST", restX, restY, { align: "center" });
+  pdf.text("API", restX, restY + 4, { align: "center" });
 }
   // =========================
   // ENDE SEITE 4
