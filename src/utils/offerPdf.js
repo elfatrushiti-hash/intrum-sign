@@ -5,8 +5,8 @@ export function exportOfferPDF(data) {
   const pdf = new jsPDF({ unit: "mm", format: "a4" });
 
   const colors = {
-    darkViolet: [23, 4, 86],
-    intrumViolet: [60, 20, 140], // nur noch Intrum-Violett
+    darkViolet: [60, 20, 140], // alle ehemals blauen Elemente jetzt Intrum-Violett
+    intrumViolet: [60, 20, 140],
     textDark: [0, 0, 0],
     textLight: [255, 255, 255],
     cardBg: [245, 245, 250],
@@ -39,9 +39,9 @@ export function exportOfferPDF(data) {
   function drawCover() {
     const steps = 100;
     for (let i = 0; i < steps; i++) {
-      const r = colors.darkViolet[0] + ((colors.intrumViolet[0] - colors.darkViolet[0]) * i) / steps;
-      const g = colors.darkViolet[1] + ((colors.intrumViolet[1] - colors.darkViolet[1]) * i) / steps;
-      const b = colors.darkViolet[2] + ((colors.intrumViolet[2] - colors.darkViolet[2]) * i) / steps;
+      const r = colors.darkViolet[0];
+      const g = colors.darkViolet[1];
+      const b = colors.darkViolet[2];
       pdf.setFillColor(r, g, b);
       pdf.rect(0, i * (297 / steps), 210, 297 / steps, "F");
     }
@@ -73,7 +73,7 @@ export function exportOfferPDF(data) {
 
     let y = 55;
     pdf.setFont("helvetica", "normal");
-    pdf.setFontSize(10); // Schriftgröße angepasst
+    pdf.setFontSize(10);
     pdf.setTextColor(...colors.textDark);
     pdf.text("Ausgearbeitet von", 20, y);
 
@@ -128,7 +128,7 @@ export function exportOfferPDF(data) {
     drawHeaderFooter(3);
 
     pdf.setFont("helvetica", "bold");
-    pdf.setFontSize(10); // Schriftgröße angepasst
+    pdf.setFontSize(10);
     pdf.setTextColor(...colors.textDark);
     pdf.text("Inhalt", 20, 20);
 
@@ -157,7 +157,7 @@ export function exportOfferPDF(data) {
       const dots = ".".repeat(dotCount);
       pdf.text(dots, startX, y);
       pdf.text(String(row.page), 190, y, { align: "right" });
-      y += 8; // Abstand leicht reduziert für Schriftgröße 10
+      y += 8;
     });
   }
 
@@ -174,7 +174,7 @@ export function exportOfferPDF(data) {
 
     let y = 20;
     pdf.setFont("helvetica", "bold");
-    pdf.setFontSize(10); // Schriftgröße angepasst
+    pdf.setFontSize(10);
     const title =
       "1\tDigital Trust Platform – Die Grundlage für sichere und effiziente digitale Geschäftsprozesse";
     const titleLines = pdf.splitTextToSize(title, maxTextWidth);
@@ -219,9 +219,6 @@ export function exportOfferPDF(data) {
 
     y += 5;
 
-    // ---------------------------
-    // KACHELN (vier Einheiten, optisch getrennt)
-    // ---------------------------
     const kacheln = [
       { title: "Kunde", boxes: ["Self-Onboarding", "CRM", "Interne Applikation", "Externe Applikation"] },
       { title: "IDENTIFICATION", boxes: ["AutoIdent", "VideoIdent", "OnlineIdent", "QES-Ident (seal.ID)", "BankIdent (ab 2026)"] },
@@ -230,14 +227,14 @@ export function exportOfferPDF(data) {
     ];
 
     const kWidth = 40;
-    const kSpacing = 10; // Abstand zwischen Kacheln größer für optische Trennung
+    const kSpacing = 10;
     const startX = marginLeft;
     let kY = y;
 
     kacheln.forEach((k, i) => {
       const x = startX + i * (kWidth + kSpacing);
 
-      // Hintergrund der Kachel
+      // Hintergrund jeder Kachel separat
       pdf.setFillColor(...colors.grayBox);
       const totalHeight = 12 + k.boxes.length * 12;
       pdf.rect(x, kY, kWidth, totalHeight, "F");
@@ -261,9 +258,6 @@ export function exportOfferPDF(data) {
     });
   }
 
-  // ---------------------------
-  // PDF GENERIEREN
-  // ---------------------------
   drawCover();
   pdf.addPage();
   drawCompanyPage();
