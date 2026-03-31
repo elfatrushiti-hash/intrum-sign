@@ -245,13 +245,14 @@ function drawDTPPage() {
   pdf.roundedRect(barX, barY, barWidth, barHeight, 2, 2, "F");
 
   // REST API Text im Vordergrund
-  const restX = marginLeft + boxWidth + gapRest / 2 + boxWidth / 2;
-  const restY = barY + 3;
-  pdf.setFont("helvetica", "bold");
-  pdf.setFontSize(8);
-  pdf.setTextColor(...colors.textDark);
-  pdf.text("REST", restX, restY, { align: "center" });
-  pdf.text("API", restX, restY + 4, { align: "center" });
+// REST API Text im Vordergrund, direkt nach Kachel 1
+const restX = marginLeft + boxWidth / 2; // direkt nach Kachel 1
+const restY = barY + 3;
+pdf.setFont("helvetica", "bold");
+pdf.setFontSize(8);
+pdf.setTextColor(...colors.textDark);
+pdf.text("REST", restX, restY, { align: "center" });
+pdf.text("API", restX, restY + 4, { align: "center" });
 
   // Kacheln links/rechts vom REST API
   kacheln.forEach((k, i) => {
