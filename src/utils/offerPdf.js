@@ -188,7 +188,7 @@ function drawDTPPage() {
   pdf.text(titleLines, marginLeft, y);
   y += titleLines.length * 6 + 4;
 
-  // Text
+  // Einleitender Text
   pdf.setFont("helvetica", "normal");
   pdf.setFontSize(10);
 
@@ -243,10 +243,10 @@ function drawDTPPage() {
     { title: "SIGNING", boxes: ["EES", "FES", "QES", "SIGN"] },
   ];
 
-  const widthBox = 35;
+  const widthBox = 30; // kleiner für Seitenränder
   const cardHeight = 8;
   const cardSpacing = 2;
-  const xSpacing = 10;
+  const xSpacing = 12; // Abstand zwischen Kacheln
 
   let xBase = marginLeft;
 
@@ -258,7 +258,7 @@ function drawDTPPage() {
   const barHeight = 10;
   const barY = y + maxHeight / 2 - barHeight / 2;
 
-  pdf.setFillColor(150, 150, 150); // etwas dunkleres Grau
+  pdf.setFillColor(160, 160, 160); // dunkleres Grau
   pdf.rect(
     marginLeft,
     barY,
@@ -277,8 +277,8 @@ function drawDTPPage() {
       y,
       widthBox,
       12 + k.boxes.length * (cardHeight + cardSpacing),
-      2,
-      2,
+      3,
+      3,
       "F"
     );
 
@@ -306,7 +306,7 @@ function drawDTPPage() {
   const xK2 = xBase + (widthBox + xSpacing);
 
   const restX = xK1 + wK1 + ((xK2 - (xK1 + wK1)) / 2);
-  const restY = barY + 3;
+  const restY = barY + 2; // höher auf Balken
 
   pdf.setFont("helvetica", "bold");
   pdf.setFontSize(8);
@@ -315,21 +315,27 @@ function drawDTPPage() {
   pdf.text("API", restX, restY + 4, { align: "center" });
 
   // --- Text unter Kacheln ---
-const bottomTextY = y + maxHeight + 10; // Abstand unter Kacheln
+  const bottomTextY = y + maxHeight + 10; // Abstand unter Kacheln
+  const bottomText = 
+    "Ein besonderes Merkmal der DTP ist der hohe Sicherheitsstandard in der Betrugsprävention. So ermöglicht z. B. Device Fingerprinting eine frühzeitige Risikoerkennung anhand technischer Merkmale und schützt bereits vor Abschluss eines Prozesses vor potenziell betrügerischen Zugriffen. Gleichzeitig gewährleistet der Zugriff auf einen breit abgestützten Fraud Pool mit Millionen Transaktionen eine kontinuierliche Risikobewertung auf Basis vernetzter Erkenntnisse. " +
+    "Durch die Kombination aus modernster Technologie, regulatorischer Konformität und praxiserprobter Integration bietet die Digital Trust Platform eine zukunftssichere Grundlage für digitale Prozesse mit hoher Akzeptanz bei Endkundinnen und Endkunden – egal ob im Finanzbereich, E-Commerce, Mobilitätssektor oder in der öffentlichen Verwaltung.";
 
-pdf.setFont("helvetica", "normal");
-pdf.setFontSize(10);
-pdf.setTextColor(...colors.textDark);
+  const bottomLines = pdf.splitTextToSize(bottomText, maxTextWidth);
 
-const bottomText =
-  "Ein besonderes Merkmal der DTP ist der hohe Sicherheitsstandard in der Betrugsprävention. " +
-  "So ermöglicht z.B. Device Fingerprinting eine fruehzeitige Risikoerkennung anhand technischer Merkmale und schützt bereits vor Abschluss eines Prozesses vor potenziell betrügerischen Zugriffen. " +
-  "Gleichzeitig gewährleistet der Zugriff auf einen breit abgestützten Fraud Pool mit Millionen Transaktionen eine kontinuierliche Risikobewertung auf Basis vernetzter Erkenntnisse. " +
-  "Durch die Kombination aus modernster Technologie, regulatorischer Konformität und praxiserprobter Integration bietet die Digital Trust Platform eine zukunftssichere Grundlage für digitale Prozesse mit hoher Akzeptanz bei Endkundinnen und Endkunden - egal ob im Finanzbereich, E-Commerce, Mobilitätssektor oder in der oeffentlichen Verwaltung.";
+  // Verhindert automatische neue Seite, falls Text zu lang
+  const availableHeight = 287 - bottomTextY;
+  let linesToPrint = bottomLines;
+  const lineHeight = 6;
 
-const bottomLines = pdf.splitTextToSize(bottomText, maxTextWidth);
+  if (bottomLines.length * lineHeight > availableHeight) {
+    const maxLines = Math.floor(availableHeight / lineHeight);
+    linesToPrint = bottomLines.slice(0, maxLines);
+  }
 
-pdf.text(bottomLines, marginLeft, bottomTextY);
+  pdf.setFont("helvetica", "normal");
+  pdf.setFontSize(10);
+  pdf.setTextColor(...colors.textDark);
+  pdf.text(linesToPrint, marginLeft, bottomTextY);
 }
 // =========================
 // ENDE SEITE 4
