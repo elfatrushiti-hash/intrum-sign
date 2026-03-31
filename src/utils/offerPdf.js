@@ -242,22 +242,21 @@ function drawDTPPage() {
   ];
 
   const boxWidth = 35;
-  const gap = 30; // größerer Abstand zwischen KUNDE und IDENTIFICATION für REST API
-
-  // Höhe der Kacheln
-  const heights = kacheln.map(k => 10 + k.boxes.length * 9);
+  const gapRest = 35; // größerer Abstand für REST API
+  const gapNormal = 10; // Abstand zwischen den anderen Kacheln
+  const heights = kacheln.map(k => 8 + k.boxes.length * 9);
   const maxHeight = Math.max(...heights);
 
-  // Balken hinter allen Kacheln
+  // Balken Hintergrund (leichter Grauton)
   const barX = marginLeft;
-  const barWidth = kacheln.length * boxWidth + (kacheln.length - 1) * gap;
+  const barWidth = kacheln.length * boxWidth + gapRest + 2 * gapNormal; // Gesamtbreite angepasst
   const barY = y + maxHeight / 2 - 7;
   const barHeight = 14;
-  pdf.setFillColor(180, 180, 180); // etwas dunkleres Grau
+  pdf.setFillColor(170, 170, 170); // etwas dunkler
   pdf.roundedRect(barX, barY, barWidth, barHeight, 2, 2, "F");
 
-  // REST API Text zwischen KUNDE und IDENTIFICATION
-  const restX = marginLeft + boxWidth + gap / 2;
+  // REST API Text
+  const restX = marginLeft + boxWidth + gapRest / 2;
   const restY = y + maxHeight / 2 - 4;
   pdf.setFont("helvetica", "bold");
   pdf.setFontSize(8);
@@ -267,8 +266,12 @@ function drawDTPPage() {
 
   // Kacheln zeichnen
   kacheln.forEach((k, i) => {
-    const x = marginLeft + i * (boxWidth + (i === 0 ? gap : 10)); // nur KUNDE-IDENTIFICATION größerer Abstand
-    const height = 10 + k.boxes.length * 9;
+    let x;
+    if (i === 0) x = marginLeft;
+    else if (i === 1) x = marginLeft + boxWidth + gapRest;
+    else x = marginLeft + boxWidth + gapRest + (i - 1) * (boxWidth + gapNormal);
+
+    const height = 8 + k.boxes.length * 9;
 
     pdf.setFillColor(...colors.grayBox);
     pdf.roundedRect(x, y, boxWidth, height, 2, 2, "F");
