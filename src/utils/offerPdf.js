@@ -233,7 +233,7 @@ function drawDTPPage() {
 
   y += 4;
 
-  // Kacheln mit REST API Balken
+  // Kacheln
   const kacheln = [
     { title: "Kunde", boxes: ["Self-Onboarding", "CRM", "Interne Applikation", "Externe Applikation"] },
     { title: "IDENTIFICATION", boxes: ["AutoIdent", "VideoIdent", "OnlineIdent", "QES-Ident (seal.ID)", "BankIdent (ab 2026)"] },
@@ -242,12 +242,12 @@ function drawDTPPage() {
   ];
 
   const boxWidth = 35;
-  const gapRest = 25; // Abstand Kachel1↔2 für REST API (etwas kleiner)
-  const gapNormal = 10; // Abstand zwischen den anderen Kacheln
+  const gapRest = 25; // Abstand Kachel1↔2 für REST API
+  const gapNormal = 10; // Abstand andere Kacheln
   const heights = kacheln.map(k => 8 + k.boxes.length * 9);
   const maxHeight = Math.max(...heights);
 
-  // Balken Hintergrund (leichter Grauton), mittig Höhe Kacheln
+  // Balken Hintergrund (mittig)
   const barX = marginLeft;
   const barWidth = boxWidth * kacheln.length + gapRest + 2 * gapNormal;
   const barY = y + maxHeight / 2 - 7;
@@ -255,9 +255,9 @@ function drawDTPPage() {
   pdf.setFillColor(150, 150, 150); // dunkleres Grau
   pdf.roundedRect(barX, barY, barWidth, barHeight, 2, 2, "F");
 
-  // REST API Text zentriert zwischen Kachel 1 und 2
+  // REST API Text im Vordergrund, zentriert auf Balken
   const restX = marginLeft + boxWidth + gapRest / 2 + boxWidth / 2;
-  const restY = y + maxHeight / 2 - 4;
+  const restY = barY + barHeight / 2 - 4; // mittig Balken
   pdf.setFont("helvetica", "bold");
   pdf.setFontSize(8);
   pdf.setTextColor(...colors.textDark);
