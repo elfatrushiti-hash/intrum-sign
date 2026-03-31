@@ -1,121 +1,260 @@
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 
-// High‑Resolution ChartJS Export (2x DPI)
-function chartImage(id) {
-  if (!window.__charts || !window.__charts[id]) return null;
-  return window.__charts[id].toBase64Image("image/png", 2.0);
-}
+export function exportOfferPDF(data) {
+  const pdf = new jsPDF({ unit: "mm", format: "a4" });
 
-export function exportPDF(data, t) {
-  const pdf = new jsPDF("p", "mm", "a4");
+  const colors = {
+    intrumPurple: [127, 61, 167],
+    intrumPurpleSoft: [236, 226, 241],
+    textDark: [0, 0, 0],
+    textLight: [255, 255, 255],
+    border: [220, 220, 230],
+    grayBox: [240, 240, 240],
+  };
 
-  /* -------------------------
-     PAGE 1 — TITLE PAGE
-  ------------------------- */
-  pdf.setFillColor(23, 4, 86);
-  pdf.rect(0, 0, 210, 297, "F");
+  function drawHeaderFooter(page) {
+    pdf.setFillColor(...colors.intrumPurple);
+    pdf.rect(0, 0, 210, 6, "F");
 
-  pdf.setFont("helvetica", "bold");
-  pdf.setFontSize(32);
-  pdf.setTextColor(255, 255, 255);
-  pdf.text("SIGN Impact Report", 20, 45);
+    pdf.setFont("helvetica", "bold");
+    pdf.setFontSize(10);
+    pdf.setTextColor(...colors.textLight);
+    pdf.text("INTRUM", 190, 12, { align: "right" });
 
-  pdf.setFontSize(16);
-  pdf.text(
-    "Einsparungsanalyse – digital vs traditionell",
-    20,
-    65
-  );
+    pdf.setFont("helvetica", "normal");
+    pdf.setFontSize(9);
+    pdf.setTextColor(120, 120, 120);
+    pdf.text("Offerte – Digital Trust Platform", 20, 287);
+    pdf.text(`Seite ${page}`, 190, 287, { align: "right" });
+  }
 
-  pdf.setFontSize(12);
-  pdf.text("Datum: " + new Date().toLocaleDateString(), 20, 85);
+  function drawCover() {
+    pdf.setFillColor(...colors.intrumPurple);
+    pdf.rect(0, 0, 210, 297, "F");
 
+    pdf.setFont("helvetica", "bold");
+    pdf.setFontSize(28);
+    pdf.setTextColor(...colors.textLight);
+    pdf.text("Offerte", 20, 80);
+
+    pdf.setFont("helvetica", "normal");
+    pdf.setFontSize(16);
+    pdf.text("Digital Trust Platform", 20, 95);
+
+    pdf.setFont("helvetica", "bold");
+    pdf.setFontSize(32);
+    pdf.text("INTRUM", 105, 260, { align: "center" });
+  }
+
+  function drawCompanyPage() {
+    drawHeaderFooter(2);
+
+    pdf.setFont("helvetica", "bold");
+    pdf.setFontSize(22);
+    pdf.setTextColor(...colors.intrumPurple);
+    pdf.text("Offerte", 20, 30);
+
+    let y = 55;
+    pdf.setFont("helvetica", "normal");
+    pdf.setFontSize(10);
+    pdf.setTextColor(...colors.textDark);
+    pdf.text("Ausgearbeitet von", 20, y);
+
+    y += 10;
+    pdf.setFont("helvetica", "bold");
+    pdf.text("Intrum AG, Eschenstrasse 12, 8603 Schwerzenbach", 20, y);
+
+    y += 6;
+    pdf.setFont("helvetica", "normal");
+    pdf.text("(nachfolgend Intrum genannt)", 20, y);
+
+    y += 10;
+    pdf.text("für", 20, y);
+
+    y += 10;
+    pdf.setFont("helvetica", "bold");
+    pdf.text("Firma (nachfolgend Partner genannt)", 20, y);
+
+    autoTable(pdf, {
+      startY: y + 8,
+      head: [["Angabe", "Details"]],
+      body: [
+        ["Firmenname", data.company || "—"],
+        ["UID", data.uid || "—"],
+        ["Handelsregister", data.hrRegister || "—"],
+        ["Adresse", data.street || "—"],
+        ["PLZ / Ort", `${data.postcode || ""} ${data.city || ""}`],
+      ],
+      headStyles: { fillColor: colors.intrumPurpleSoft },
+      styles: { fontSize: 10 },
+      margin: { left: 20, right: 20 },
+    });
+
+    autoTable(pdf, {
+      startY: pdf.lastAutoTable.finalY + 15,
+      head: [["Ansprechperson", "Details"]],
+      body: [
+        ["Name", data.contactName || "—"],
+        ["Telefon", data.contactPhone || "—"],
+        ["E-Mail", data.contactEmail || "—"],
+      ],
+      headStyles: { fillColor: colors.intrumPurpleSoft },
+      styles: { fontSize: 10 },
+      margin: { left: 20, right: 20 },
+    });
+  }
+
+  function drawTableOfContents() {
+    drawHeaderFooter(3);
+
+    pdf.setFont("helvetica", "bold");
+    pdf.setFontSize(10);
+    pdf.text("Inhalt", 20, 20);
+
+    let y = 40;
+    const toc = [
+      { title: "1  Digital Trust Platform – Überblick", page: 4 },
+      { title: "2  SIGNING", page: 5 },
+      { title: "2.1  EES – Einfache Signatur", page: 5 },
+      { title: "2.2  FES – Fortgeschrittene Signatur", page: 5 },
+      { title: "2.3  QES – Qualifizierte Signatur", page: 5 },
+      { title: "2.4  Identifikation / seal.ID", page: 5 },
+      { title: "3  Setup Gebühren", page: 6 },
+      { title: "4  Verschwiegenheitsklausel", page: 6 },
+      { title: "5  Gültigkeit des Angebots", page: 6 },
+    ];
+
+    toc.forEach((row) => {
+      pdf.setFont("helvetica", "normal");
+      pdf.text(row.title, 20, y);
+
+      const textWidth = pdf.getTextWidth(row.title);
+      const startX = 20 + textWidth + 2;
+      const endX = 180;
+      const dotCount = Math.floor((endX - startX) / pdf.getTextWidth("."));
+      pdf.text(".".repeat(dotCount), startX, y);
+      pdf.text(String(row.page), 190, y, { align: "right" });
+
+      y += 8;
+    });
+  }
+
+  function drawDTPPage() {
+    drawHeaderFooter(4);
+
+    const marginLeft = 20;
+    const marginRight = 190;
+    const maxTextWidth = marginRight - marginLeft;
+
+    let y = 20;
+
+    // Titel
+    pdf.setFont("helvetica", "bold");
+    pdf.setFontSize(14);
+    const title =
+      "1 Digital Trust Platform – Die Grundlage für sichere und effiziente digitale Geschäftsprozesse";
+
+    const titleLines = pdf.splitTextToSize(title, maxTextWidth);
+    pdf.text(titleLines, marginLeft, y);
+    y += titleLines.length * 7 + 2;
+
+    // Text
+    pdf.setFont("helvetica", "normal");
+    pdf.setFontSize(10);
+
+    const paragraph =
+      "Die Digital Trust Platform (DTP) verbindet alle zentralen Elemente für ein durchgängig digitales und vertrauenswürdiges Onboarding in einer modular aufgebauten Lösung: von der Identifikation über Bonitäts- und Fraud-Prüfungen bis hin zur elektronischen Signatur – sicher, rechtskonform und effizient. Die Plattform wurde speziell dafür entwickelt, Unternehmen bei der Digitalisierung kritischer Prozesse zu unterstützen, ohne dabei Kompromisse bei Sicherheit, Nutzerfreundlichkeit oder regulatorischer Konformität einzugehen. Sie lässt sich flexibel in bestehende Systemlandschaften integrieren und ermöglicht so individuelle Customer Journeys mit hohem Automatisierungsgrad.";
+
+    const textLines = pdf.splitTextToSize(paragraph, maxTextWidth);
+    pdf.text(textLines, marginLeft, y);
+    y += textLines.length * 6 + 4;
+
+    // Kernmodule
+    pdf.setFont("helvetica", "bold");
+    pdf.text("Kernmodule der DTP sind:", marginLeft, y);
+    y += 6;
+
+    const bullets = [
+      {
+        title: "Identification",
+        text:
+          "Verschiedene Verfahren wie AutoIdent, VideoIdent oder vor-Ort-Identifikation, je nach regulatorischen Anforderungen.",
+      },
+      {
+        title: "Smart Data",
+        text:
+          "Intelligente Prüfungen wie Bonitätsbewertung (AI Credit Scores), Adressverifikation, Fraud Check und Compliance Screening – nahtlos eingebunden in den Onboarding-Prozess.",
+      },
+      {
+        title: "Signing",
+        text:
+          "Elektronische Signatur mit Unterstützung aller drei Signaturstufen (EES, FES, QES), rechtssicher und benutzerfreundlich.",
+      },
+    ];
+
+    bullets.forEach((b) => {
+      pdf.setFont("helvetica", "bold");
+      const label = `• ${b.title}:`;
+      pdf.text(label, marginLeft, y);
+
+      const textX = marginLeft + pdf.getTextWidth(label) + 2;
+
+      pdf.setFont("helvetica", "normal");
+      const lines = pdf.splitTextToSize(
+        b.text,
+        marginRight - textX
+      );
+      pdf.text(lines, textX, y);
+
+      y += lines.length * 6 + 2;
+    });
+
+    y += 5;
+
+    // Kacheln
+    const kacheln = [
+      { title: "Kunde", boxes: ["Self-Onboarding", "CRM", "Interne Applikation", "Externe Applikation"] },
+      { title: "IDENTIFICATION", boxes: ["AutoIdent", "VideoIdent", "OnlineIdent", "QES-Ident (seal.ID)", "BankIdent (ab 2026)"] },
+      { title: "SMART DATA", boxes: ["Credit Scores", "Data Reports", "Address", "Fraud", "Compliance", "ZEK/IKO/KREMO"] },
+      { title: "SIGNING", boxes: ["EES", "FES", "QES", "SIGN"] },
+    ];
+
+    const spacing = 5;
+    const widthBox = (marginRight - marginLeft - spacing * 3) / 4;
+
+    kacheln.forEach((k, i) => {
+      const x = marginLeft + i * (widthBox + spacing);
+
+      pdf.setFillColor(...colors.grayBox);
+      pdf.rect(x, y, widthBox, 12 + k.boxes.length * 10, "F");
+
+      pdf.setFont("helvetica", "bold");
+      pdf.text(k.title, x + 2, y + 6);
+
+      k.boxes.forEach((b, j) => {
+        const yy = y + 10 + j * 10;
+
+        pdf.setFillColor(...colors.intrumPurple);
+        pdf.rect(x + 1, yy, widthBox - 2, 8, "F");
+
+        pdf.setFont("helvetica", "normal");
+        pdf.setTextColor(...colors.textLight);
+        pdf.setFontSize(9);
+        pdf.text(b, x + 2, yy + 5.5);
+      });
+
+      pdf.setTextColor(...colors.textDark);
+    });
+  }
+
+  drawCover();
   pdf.addPage();
-
-
-  /* -------------------------
-     PAGE 2 — KPI TABLE + DONUT
-  ------------------------- */
-  pdf.setFont("helvetica", "bold");
-  pdf.setFontSize(20);
-  pdf.setTextColor(23, 4, 86);
-  pdf.text("KPI Analyse", 20, 20);
-
-  const kpis = [
-    [t.kpi.handwritten, data.totalHand.toFixed(2) + " CHF"],
-    [t.kpi.digital, data.totalDigital.toFixed(2) + " CHF"],
-    [t.kpi.timeSaved, data.timeSaved.toFixed(2) + " h"],
-    [t.kpi.moneySaved, data.moneySaved.toFixed(2) + " CHF"],
-    [t.kpi.co2Saved, data.co2Saved.toFixed(2) + " kg"]
-  ];
-
-  autoTable(pdf, {
-    head: [["Kategorie", "Wert"]],
-    body: kpis,
-    startY: 30,
-    headStyles: { fillColor: [23, 4, 86], textColor: 255 },
-    styles: { fontSize: 11 }
-  });
-
-  // High DPI Donut Chart
-  const donut = chartImage("donut-chart");
-  if (donut) {
-    pdf.addImage(donut, "PNG", 25, 90, 160, 160);
-  }
-
+  drawCompanyPage();
   pdf.addPage();
+  drawTableOfContents();
+  pdf.addPage();
+  drawDTPPage();
 
-
-  /* -------------------------
-     PAGE 3 — TABLES + CHARTS
-  ------------------------- */
-  pdf.setFont("helvetica", "bold");
-  pdf.setFontSize(20);
-  pdf.setTextColor(23, 4, 86);
-  pdf.text("Vergleich & Trends", 20, 20);
-
-  // Benchmark
-  autoTable(pdf, {
-    startY: 30,
-    head: [["Kategorie", "Wert"]],
-    body: [
-      [t.benchmark.avgCost, "8.50 CHF"],
-      [
-        t.benchmark.yourCost,
-        (data.totalHand / (data.docs * data.signs)).toFixed(2) + " CHF"
-      ]
-    ],
-    headStyles: { fillColor: [23, 4, 86], textColor: 255 },
-    styles: { fontSize: 11 },
-  });
-
-  // Comparison
-  autoTable(pdf, {
-    startY: pdf.lastAutoTable.finalY + 10,
-    head: [[t.comparison.category, t.comparison.paper, t.comparison.digital]],
-    body: [
-      [t.comparison.cost, data.totalHand.toFixed(2), data.totalDigital.toFixed(2)],
-      [t.comparison.time, "0", data.timeSaved.toFixed(2)],
-      [t.comparison.co2, "0", data.co2Saved.toFixed(2)],
-    ],
-    styles: { fontSize: 11 },
-  });
-
-  let y = pdf.lastAutoTable.finalY + 20;
-
-  // Line Chart – High DPI
-  const line = chartImage("line-chart");
-  if (line) {
-    pdf.addImage(line, "PNG", 15, y, 180, 70);
-    y += 80;
-  }
-
-  // CO2 Chart – High DPI
-  const co2 = chartImage("co2-chart");
-  if (co2) {
-    pdf.addImage(co2, "PNG", 15, y, 180, 70);
-  }
-
-  pdf.save("SIGN_Impact_Report.pdf");
+  pdf.save(`Offerte_${data.company || "Angebot"}.pdf`);
 }
