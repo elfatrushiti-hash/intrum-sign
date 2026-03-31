@@ -173,7 +173,8 @@ function drawDTPPage() {
   drawHeaderFooter(4);
 
   const marginLeft = 20;
-  const maxTextWidth = 210 - marginLeft - 20;
+  const marginRight = 20;
+  const maxTextWidth = 210 - marginLeft - marginRight;
 
   let y = 20;
 
@@ -244,8 +245,8 @@ function drawDTPPage() {
     { title: "SIGNING", boxes: ["EES", "FES", "QES", "SIGN"] },
   ];
 
-  const boxWidth = 40;
-  const gap = 10;
+  const boxWidth = 35; // kleiner, damit Seitenränder eingehalten werden
+  const gap = 8;       // kleiner Abstand zwischen Kacheln
 
   // Berechne maximale Höhe aller Kacheln für Balken
   const heights = kacheln.map(k => 10 + k.boxes.length * 9);
@@ -254,7 +255,7 @@ function drawDTPPage() {
   // Balken hinter allen Kacheln
   const barX = marginLeft;
   const barWidth = kacheln.length * boxWidth + (kacheln.length - 1) * gap;
-  const barY = y + maxHeight / 2 - 7; // Balken Höhe 14
+  const barY = y + maxHeight / 2 - 7;
   const barHeight = 14;
 
   pdf.setFillColor(240, 240, 240); // hellgrau
@@ -264,10 +265,10 @@ function drawDTPPage() {
   const restX = marginLeft + boxWidth + gap / 2;
   const restY = y + maxHeight / 2 - 4;
   pdf.setFont("helvetica", "bold");
-  pdf.setFontSize(10);
+  pdf.setFontSize(8); // kleinere Schrift
   pdf.setTextColor(...colors.textDark);
   pdf.text("REST", restX + boxWidth / 2, restY, { align: "center" });
-  pdf.text("API", restX + boxWidth / 2, restY + 6, { align: "center" });
+  pdf.text("API", restX + boxWidth / 2, restY + 4, { align: "center" });
 
   // Kacheln zeichnen
   kacheln.forEach((k, i) => {
@@ -278,11 +279,10 @@ function drawDTPPage() {
     pdf.rect(x, y, boxWidth, height, "F");
 
     pdf.setFont("helvetica", "bold");
-    pdf.setFontSize(9);
+    pdf.setFontSize(8);
     pdf.setTextColor(...colors.textDark);
     pdf.text(k.title, x + 2, y + 6);
 
-    pdf.setFontSize(8);
     k.boxes.forEach((b, j) => {
       const yy = y + 8 + j * 9;
       pdf.setFillColor(...colors.intrumPurple);
