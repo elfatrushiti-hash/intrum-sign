@@ -169,7 +169,7 @@ export function exportOfferPDF(data) {
   // =========================
   // SEITE 4 — DIGITAL TRUST PLATFORM
   // =========================
-  function drawDTPPage() {
+function drawDTPPage() {
   drawHeaderFooter(4);
 
   const marginLeft = 20;
@@ -205,7 +205,7 @@ export function exportOfferPDF(data) {
   pdf.text("Kernmodule der DTP sind:", marginLeft, y);
   y += 5;
 
-  // Bulletpoints
+  // Bulletpoints mit größerem Abstand nach ":"
   const bullets = [
     {
       title: "Identification",
@@ -227,13 +227,11 @@ export function exportOfferPDF(data) {
   bullets.forEach((b) => {
     pdf.setFont("helvetica", "bold");
     pdf.text("•", marginLeft, y);
-
-    pdf.text(`${b.title}:`, marginLeft + 4, y);
+    pdf.text(`${b.title}:`, marginLeft + 4, y); // Bulletpoint Titel
 
     pdf.setFont("helvetica", "normal");
-    const lines = pdf.splitTextToSize(b.text, maxTextWidth - 25);
-    pdf.text(lines, marginLeft + 25, y);
-
+    const lines = pdf.splitTextToSize(b.text, maxTextWidth - 30); // <-- Abstand nach ":" vergrößert
+    pdf.text(lines, marginLeft + 30, y); // <-- Text startet weiter rechts
     y += lines.length * 5 + 2;
   });
 
@@ -252,7 +250,6 @@ export function exportOfferPDF(data) {
 
   kacheln.forEach((k, i) => {
     const x = marginLeft + i * (boxWidth + gap);
-
     const height = 10 + k.boxes.length * 9;
 
     // Hintergrund
