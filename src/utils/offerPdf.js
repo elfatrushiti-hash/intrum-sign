@@ -323,9 +323,9 @@ pdf.setTextColor(...colors.textDark);
 
 const bottomText =
   "Ein besonderes Merkmal der DTP ist der hohe Sicherheitsstandard in der Betrugsprävention. " +
-  "So ermoeglicht z.B. Device Fingerprinting eine fruehzeitige Risikoerkennung anhand technischer Merkmale und schützt bereits vor Abschluss eines Prozesses vor potenziell betrügerischen Zugriffen. " +
-  "Gleichzeitig gewaehrleistet der Zugriff auf einen breit abgestuetzten Fraud Pool mit Millionen Transaktionen eine kontinuierliche Risikobewertung auf Basis vernetzter Erkenntnisse. " +
-  "Durch die Kombination aus modernster Technologie, regulatorischer Konformitaet und praxiserprobter Integration bietet die Digital Trust Platform eine zukunftssichere Grundlage für digitale Prozesse mit hoher Akzeptanz bei Endkundinnen und Endkunden - egal ob im Finanzbereich, E-Commerce, Mobilitätssektor oder in der oeffentlichen Verwaltung.";
+  "So ermöglicht z.B. Device Fingerprinting eine fruehzeitige Risikoerkennung anhand technischer Merkmale und schützt bereits vor Abschluss eines Prozesses vor potenziell betrügerischen Zugriffen. " +
+  "Gleichzeitig gewährleistet der Zugriff auf einen breit abgestützten Fraud Pool mit Millionen Transaktionen eine kontinuierliche Risikobewertung auf Basis vernetzter Erkenntnisse. " +
+  "Durch die Kombination aus modernster Technologie, regulatorischer Konformität und praxiserprobter Integration bietet die Digital Trust Platform eine zukunftssichere Grundlage für digitale Prozesse mit hoher Akzeptanz bei Endkundinnen und Endkunden - egal ob im Finanzbereich, E-Commerce, Mobilitätssektor oder in der oeffentlichen Verwaltung.";
 
 const bottomLines = pdf.splitTextToSize(bottomText, maxTextWidth);
 
