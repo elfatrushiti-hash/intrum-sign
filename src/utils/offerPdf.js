@@ -173,9 +173,10 @@ function drawDTPPage() {
 
   const marginLeft = 20;
   const marginRight = 20;
-  const marginBottom = 15;
+  const pageWidth = 210;
   const pageHeight = 297;
-  const maxTextWidth = 210 - marginLeft - marginRight;
+  const maxTextWidth = pageWidth - marginLeft - marginRight;
+  const marginBottom = 20;
 
   let y = 20;
 
@@ -195,13 +196,13 @@ function drawDTPPage() {
   pdf.setFontSize(10);
 
   const paragraph =
-    "Die Digital Trust Platform (DTP) verbindet alle zentralen Elemente für ein durchgängig digitales und vertrauenswürdiges Onboarding: von der Identifikation über Bonitäts- und Fraud-Prüfungen bis hin zur elektronischen Signatur – sicher, rechtskonform und effizient.";
+    "Die Digital Trust Platform (DTP) verbindet alle zentralen Elemente für ein durchgängig digitales und vertrauenswürdiges Onboarding in einer modular aufgebauten Lösung: von der Identifikation über Bonitäts- und Fraud-Prüfungen bis hin zur elektronischen Signatur – sicher, rechtskonform und effizient. Die Plattform wurde speziell dafür entwickelt, Unternehmen bei der Digitalisierung kritischer Prozesse zu unterstützen, ohne dabei Kompromisse bei Sicherheit, Nutzerfreundlichkeit oder regulatorischer Konformität einzugehen. Sie lässt sich flexibel in bestehende Systemlandschaften integrieren und ermöglicht so individuelle Customer Journeys mit hohem Automatisierungsgrad.";
 
   const paragraphLines = pdf.splitTextToSize(paragraph, maxTextWidth);
   pdf.text(paragraphLines, marginLeft, y);
   y += paragraphLines.length * 6 + 4;
 
-  // Bullet Titel
+  // Bullet-Titel
   pdf.setFont("helvetica", "bold");
   pdf.text("Kernmodule der DTP sind:", marginLeft, y);
   y += 6;
@@ -215,7 +216,7 @@ function drawDTPPage() {
     {
       title: "Smart Data",
       text:
-        "Intelligente Prüfungen wie Bonitätsbewertung, Adressverifikation, Fraud Check und Compliance Screening – nahtlos im Onboarding-Prozess integriert.",
+        "Intelligente Prüfungen wie Bonitätsbewertung (AI Credit Scores), Adressverifikation, Fraud Check und Compliance Screening – nahtlos eingebunden in den Onboarding-Prozess.",
     },
     {
       title: "Signing",
@@ -245,21 +246,22 @@ function drawDTPPage() {
     { title: "SIGNING", boxes: ["EES", "FES", "QES", "SIGN"] },
   ];
 
-  const widthBox = 30;
+  const widthBox = 32;
   const cardHeight = 8;
   const cardSpacing = 2;
-  const xSpacing = 12;
+  const xSpacing = 15;
 
   let xBase = marginLeft;
+
   const maxHeight = Math.max(
     ...kacheln.map((k) => 12 + k.boxes.length * (cardHeight + cardSpacing))
   );
 
-  // Balken
+  // Balken (leicht dunkleres Grau)
   const barHeight = 10;
   const barY = y + maxHeight / 2 - barHeight / 2;
 
-  pdf.setFillColor(160, 160, 160);
+  pdf.setFillColor(150, 150, 150);
   pdf.rect(
     marginLeft,
     barY,
@@ -307,7 +309,7 @@ function drawDTPPage() {
   const xK2 = xBase + (widthBox + xSpacing);
 
   const restX = xK1 + wK1 + ((xK2 - (xK1 + wK1)) / 2);
-  const restY = barY + 2;
+  const restY = barY + 3;
 
   pdf.setFont("helvetica", "bold");
   pdf.setFontSize(8);
@@ -318,13 +320,14 @@ function drawDTPPage() {
   // --- Text unter Kacheln ---
   const bottomTextY = y + maxHeight + 10;
   const maxBottomY = pageHeight - marginBottom;
+
   const bottomText =
-    "Ein besonderes Merkmal der DTP ist der hohe Sicherheitsstandard in der Betrugsprävention. Device Fingerprinting erkennt frühzeitig Risiken und schützt vor betrügerischen Zugriffen. Zugriff auf den Fraud Pool ermöglicht eine kontinuierliche Risikobewertung. Modernste Technologie, regulatorische Konformität und praxiserprobte Integration bieten eine sichere Grundlage für digitale Prozesse.";
+    "Ein besonderes Merkmal der DTP ist der hohe Sicherheitsstandard in der Betrugsprävention. Device Fingerprinting ermöglicht frühzeitige Risikoerkennung und schützt vor potenziellen betrügerischen Zugriffen. Der Zugriff auf einen breit abgestützten Fraud Pool mit Millionen Transaktionen sichert eine kontinuierliche Risikobewertung. Durch Kombination aus modernster Technologie, regulatorischer Konformität und praxiserprobter Integration bietet die DTP eine zukunftssichere Grundlage für digitale Prozesse mit hoher Akzeptanz.";
 
   const bottomLines = pdf.splitTextToSize(bottomText, maxTextWidth);
-
-  // Prüfen, ob Text noch auf die Seite passt, sonst kürzen
   let totalHeight = bottomLines.length * 6;
+
+  // Text kürzen, falls er über den unteren Rand hinausgeht
   if (bottomTextY + totalHeight > maxBottomY) {
     const allowedLines = Math.floor((maxBottomY - bottomTextY) / 6);
     pdf.text(bottomLines.slice(0, allowedLines), marginLeft, bottomTextY);
@@ -334,8 +337,7 @@ function drawDTPPage() {
 }
 // =========================
 // ENDE SEITE 4
-// =========================
-  
+// =========================  
 
   // =========================
 // SEITE 5 — SIGNING
