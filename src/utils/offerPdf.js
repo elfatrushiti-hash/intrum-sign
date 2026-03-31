@@ -352,7 +352,7 @@ function drawSigningPage() {
   const maxTextWidth = pageWidth - marginLeft - marginRight;
   const marginBottom = 20;
 
-  let y = 20;
+  let y = 10;
 
   // Titel
   pdf.setFont("helvetica", "bold");
@@ -385,6 +385,39 @@ function drawSigningPage() {
   const eesLines = pdf.splitTextToSize(eesText, maxTextWidth);
   pdf.text(eesLines, marginLeft, y);
   y += eesLines.length * 6 + 10;
+
+// -------------------------
+// Tabelle unter 2.1 EES
+// -------------------------
+y += 10; // Abstand nach dem EES Text
+
+const tableMarginLeft = marginLeft;
+const tableWidth = maxTextWidth;
+const col1Width = tableWidth * 0.7;
+const col2Width = tableWidth * 0.3;
+const rowHeight = 10;
+
+// Kopfzeile
+pdf.setFillColor(220, 210, 200); // warmes Grau
+pdf.rect(tableMarginLeft, y, col1Width, rowHeight, "F");
+pdf.rect(tableMarginLeft + col1Width, y, col2Width, rowHeight, "F");
+
+// Text Kopfzeile
+pdf.setFont("helvetica", "bold");
+pdf.setFontSize(10);
+pdf.setTextColor(...colors.textDark);
+pdf.text("Beschreibung", tableMarginLeft + 2, y + 7);
+pdf.text("Preis (in CHF)", tableMarginLeft + col1Width + 2, y + 7);
+
+y += rowHeight;
+
+// Leere zweite Zeile (für Inhalte später)
+pdf.setFillColor(255, 255, 255); // Weiß
+pdf.rect(tableMarginLeft, y, col1Width, rowHeight, "F");
+pdf.rect(tableMarginLeft + col1Width, y, col2Width, rowHeight, "F");
+
+y += rowHeight + 10; // Abstand nach unten
+  
 }
 // =========================
 // ENDE SEITE 5
