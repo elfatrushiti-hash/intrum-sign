@@ -8,7 +8,7 @@ export function exportOfferPDF(data) {
     darkViolet: [23, 4, 86],
     midViolet: [120, 50, 180],
     lightViolet: [180, 120, 220],
-    intrumViolet: [80, 30, 160], // dunkler Violett für Akzente
+    intrumViolet: [80, 30, 160],
     textDark: [0,0,0],
     textLight: [255,255,255],
     cardBg: [245,245,250],
@@ -73,7 +73,7 @@ export function exportOfferPDF(data) {
     pdf.setTextColor(...colors.intrumViolet);
     pdf.text("Offerte", 20, 30);
 
-    // Text darunter mit Abstand
+    // Text darunter
     let y = 55;
     pdf.setFont("helvetica","normal");
     pdf.setFontSize(11);
@@ -95,7 +95,7 @@ export function exportOfferPDF(data) {
     pdf.setFont("helvetica","bold");
     pdf.text("Firma (nachfolgend Partner genannt)",20,y);
 
-    // Block 1: Unternehmensdaten
+    // Unternehmensdaten
     autoTable(pdf,{
       startY: y + 8,
       head:[["Angabe","Details"]],
@@ -111,7 +111,6 @@ export function exportOfferPDF(data) {
       margin:{left:20,right:20}
     });
 
-    // Block 2: Kontaktperson
     autoTable(pdf,{
       startY: pdf.lastAutoTable.finalY + 15,
       head:[["Ansprechperson","Details"]],
@@ -156,15 +155,13 @@ export function exportOfferPDF(data) {
       pdf.setFontSize(11);
       pdf.text(row.title, 20, y);
 
-      // gepunktete Linie dynamisch von Textende bis kurz vor Seitenzahl
       const textWidth = pdf.getTextWidth(row.title);
       const startX = 20 + textWidth + 2;
-      const endX = 190 - 10; // Abstand zur Seitenzahl
-      const lineCount = Math.floor((endX-startX)/2);
+      const endX = 180; // Abstand zur Seitenzahl
+      let lineCount = Math.floor((endX-startX)/2);
       let dots = "";
-      for(let i=0;i<lineCount;i++){ dots+="."; }
+      for(let i=0;i<lineCount;i++) dots+=".";
       pdf.text(dots, startX, y);
-
       pdf.text(row.page, 190, y, {align:"right"});
       y+=10;
     });
@@ -181,9 +178,6 @@ export function exportOfferPDF(data) {
     const pageWidth = 210;
     const maxTextWidth = pageWidth - marginLeft - marginRight;
 
-    // ---------------------------
-    // TITEL + TEXT
-    // ---------------------------
     let y = 20;
     pdf.setFont("helvetica","bold");
     pdf.setFontSize(14);
@@ -208,9 +202,6 @@ export function exportOfferPDF(data) {
     pdf.text("Kernmodule der DTP sind:",marginLeft,y);
     y+=7;
 
-    // ---------------------------
-    // BULLETS
-    // ---------------------------
     const bullets = [
       {title:"Identification", text:"Verschiedene Verfahren wie AutoIdent, VideoIdent oder vor-Ort-Identifikation, je nach regulatorischen Anforderungen."},
       {title:"Smart Data", text:"Intelligente Prüfungen wie Bonitätsbewertung (AI Credit Scores), Adressverifikation, Fraud Check und Compliance Screening – nahtlos eingebunden in den Onboarding-Prozess."},
@@ -229,10 +220,10 @@ export function exportOfferPDF(data) {
     y+=5;
 
     // ---------------------------
-    // GRAFIK – 4 KACHELN NEBENEINANDER
+    // KACHELN
     // ---------------------------
     const kacheln = [
-      {title:"Kunde", boxes:["Self-Onboarding","CRM","Interne Applikation","Externe Applikation"]},
+      {title:"KUNDE", boxes:["Self-Onboarding","CRM","Interne Applikation","Externe Applikation"]},
       {title:"IDENTIFICATION", boxes:["AutoIdent","VideoIdent","OnlineIdent","QES-Ident (seal.ID)","BankIdent (ab 2026)"]},
       {title:"SMART DATA", boxes:["Credit Scores","Data Reports","Address","Fraud","Compliance","ZEK/IKO/KREMO"]},
       {title:"SIGNING", boxes:["EES","FES","QES","SIGN"]}
@@ -245,18 +236,14 @@ export function exportOfferPDF(data) {
 
     kacheln.forEach((k,i)=>{
       const x = kStartX + i*(kWidth + kSpacing);
-
-      // Kachel Hintergrund
       pdf.setFillColor(245,245,245);
       pdf.rect(x,kY,kWidth,60 + k.boxes.length*12,"F");
 
-      // Kachel Titel
       pdf.setFont("helvetica","bold");
       pdf.setFontSize(10);
       pdf.setTextColor(...colors.textDark);
       pdf.text(k.title,x+2,kY+7);
 
-      // Boxen
       k.boxes.forEach((b,j)=>{
         const yBox = kY + 12 + j*12;
         pdf.setFillColor(...colors.intrumViolet);
