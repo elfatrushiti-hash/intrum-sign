@@ -169,12 +169,16 @@ export function exportOfferPDF(data) {
   // =========================
   // SEITE 4 — DIGITAL TRUST PLATFORM
   // =========================
+
 function drawDTPPage() {
   drawHeaderFooter(4);
 
   const marginLeft = 20;
   const marginRight = 20;
-  const maxTextWidth = 210 - marginLeft - marginRight;
+  const pageWidth = 210;
+  const maxTextWidth = pageWidth - marginLeft - marginRight;
+  const pageHeight = 297;
+  const marginBottom = 20;
 
   let y = 20;
 
@@ -182,61 +186,42 @@ function drawDTPPage() {
   pdf.setFont("helvetica", "bold");
   pdf.setFontSize(14);
   pdf.setTextColor(...colors.textDark);
-
-  const title =
-    "1 Digital Trust Platform – Die Grundlage für sichere und effiziente digitale Geschäftsprozesse";
+  const title = "1\tDigital Trust Platform – Die Grundlage für sichere und effiziente digitale Geschäftsprozesse";
   const titleLines = pdf.splitTextToSize(title, maxTextWidth);
   pdf.text(titleLines, marginLeft, y);
   y += titleLines.length * 6 + 4;
 
-  // Text
+  // Einleitender Text
   pdf.setFont("helvetica", "normal");
   pdf.setFontSize(10);
-
   const paragraph =
     "Die Digital Trust Platform (DTP) verbindet alle zentralen Elemente für ein durchgängig digitales und vertrauenswürdiges Onboarding in einer modular aufgebauten Lösung: von der Identifikation über Bonitäts- und Fraud-Prüfungen bis hin zur elektronischen Signatur – sicher, rechtskonform und effizient. Die Plattform wurde speziell dafür entwickelt, Unternehmen bei der Digitalisierung kritischer Prozesse zu unterstützen, ohne dabei Kompromisse bei Sicherheit, Nutzerfreundlichkeit oder regulatorischer Konformität einzugehen. Sie lässt sich flexibel in bestehende Systemlandschaften integrieren und ermöglicht so individuelle Customer Journeys mit hohem Automatisierungsgrad.";
+  const paraLines = pdf.splitTextToSize(paragraph, maxTextWidth);
+  pdf.text(paraLines, marginLeft, y);
+  y += paraLines.length * 6 + 6;
 
-  const paragraphLines = pdf.splitTextToSize(paragraph, maxTextWidth);
-  pdf.text(paragraphLines, marginLeft, y);
-  y += paragraphLines.length * 6 + 4;
-
-  // Bullet Titel
+  // Kernmodule
   pdf.setFont("helvetica", "bold");
   pdf.text("Kernmodule der DTP sind:", marginLeft, y);
-  y += 6;
+  y += 8;
 
   const bullets = [
-    {
-      title: "Identification",
-      text:
-        "Verschiedene Verfahren wie AutoIdent, VideoIdent oder vor-Ort-Identifikation, je nach regulatorischen Anforderungen.",
-    },
-    {
-      title: "Smart Data",
-      text:
-        "Intelligente Prüfungen wie Bonitätsbewertung (AI Credit Scores), Adressverifikation, Fraud Check und Compliance Screening – nahtlos eingebunden in den Onboarding-Prozess.",
-    },
-    {
-      title: "Signing",
-      text:
-        "Elektronische Signatur mit Unterstützung aller drei Signaturstufen (EES, FES, QES), rechtssicher und benutzerfreundlich.",
-    },
+    { title: "Identification", text: "Verschiedene Verfahren wie AutoIdent, VideoIdent oder vor-Ort-Identifikation, je nach regulatorischen Anforderungen." },
+    { title: "Smart Data", text: "Intelligente Prüfungen wie Bonitätsbewertung (AI Credit Scores), Adressverifikation, Fraud Check und Compliance Screening – nahtlos eingebunden in den Onboarding-Prozess." },
+    { title: "Signing", text: "Elektronische Signatur mit Unterstützung aller drei Signaturstufen (EES, FES, QES), rechtssicher und benutzerfreundlich." },
   ];
 
   bullets.forEach((b) => {
     pdf.setFont("helvetica", "bold");
     pdf.text(`• ${b.title}:`, marginLeft, y);
-
     pdf.setFont("helvetica", "normal");
-    const lines = pdf.splitTextToSize(b.text, maxTextWidth - 25);
-    pdf.text(lines, marginLeft + 25, y);
-
-    y += lines.length * 6 + 2;
+    const bulletLines = pdf.splitTextToSize(b.text, maxTextWidth - 25);
+    pdf.text(bulletLines, marginLeft + 25, y);
+    y += bulletLines.length * 6 + 4;
   });
+  y += 6;
 
-  y += 5;
-
-  // Kacheln
+  // Kacheln & REST API
   const kacheln = [
     { title: "Kunde", boxes: ["Self-Onboarding", "CRM", "Interne Applikation", "Externe Applikation"] },
     { title: "IDENTIFICATION", boxes: ["AutoIdent", "VideoIdent", "OnlineIdent", "QES-Ident (seal.ID)", "BankIdent (ab 2026)"] },
@@ -244,95 +229,69 @@ function drawDTPPage() {
     { title: "SIGNING", boxes: ["EES", "FES", "QES", "SIGN"] },
   ];
 
-  const widthBox = 35;
-  const cardHeight = 8;
-  const cardSpacing = 2;
-  const xSpacing = 10;
+  const boxWidth = 35;      // kleinere Kacheln für Seitenränder
+  const boxSpacing = 8;
+  const cardHeight = 10;
+  const cardSpacing = 4;
 
   let xBase = marginLeft;
+  const yBase = y;
 
-  const maxHeight = Math.max(
-    ...kacheln.map((k) => 12 + k.boxes.length * (cardHeight + cardSpacing))
-  );
+  // Berechne Kachel 1 und REST API Abstand
+  const restApiHeight = 14;
+  const restApiWidth = 20;
+  const restApiX = xBase + boxWidth + 10; // nach Kachel1
+  const restApiY = yBase + 12; // mittig zur Höhe der Kachel1
 
-  // Balken
-  const barHeight = 10;
-  const barY = y + maxHeight / 2 - barHeight / 2;
-
-  pdf.setFillColor(180, 180, 180);
-  pdf.rect(
-    marginLeft,
-    barY,
-    kacheln.length * (widthBox + xSpacing) - xSpacing,
-    barHeight,
-    "F"
-  );
-
-  // Kacheln zeichnen
   kacheln.forEach((k, i) => {
-    const x = xBase + i * (widthBox + xSpacing);
+    let x = xBase + i * (boxWidth + boxSpacing);
 
+    // Kachel Hintergrund abgerundet
+    const kHeight = 12 + k.boxes.length * (cardHeight + cardSpacing);
     pdf.setFillColor(...colors.grayBox);
-    pdf.roundedRect(
-      x,
-      y,
-      widthBox,
-      12 + k.boxes.length * (cardHeight + cardSpacing),
-      2,
-      2,
-      "F"
-    );
+    pdf.roundedRect(x, yBase, boxWidth, kHeight, 2, 2, "F");
 
+    // Kachel Titel
     pdf.setFont("helvetica", "bold");
-    pdf.setFontSize(8);
+    pdf.setFontSize(10);
     pdf.setTextColor(...colors.textDark);
-    pdf.text(k.title, x + 2, y + 7);
+    pdf.text(k.title, x + 2, yBase + 7);
 
+    // Cards
+    pdf.setFont("helvetica", "normal");
+    pdf.setFontSize(8);
     k.boxes.forEach((b, j) => {
-      const yy = y + 12 + j * (cardHeight + cardSpacing);
-
       pdf.setFillColor(...colors.intrumPurple);
-      pdf.roundedRect(x, yy, widthBox, cardHeight, 2, 2, "F");
-
-      pdf.setFont("helvetica", "normal");
-      pdf.setFontSize(8);
+      pdf.roundedRect(x, yBase + 12 + j * (cardHeight + cardSpacing), boxWidth, cardHeight, 2, 2, "F");
       pdf.setTextColor(...colors.textLight);
-      pdf.text(b, x + 2, yy + 5);
+      pdf.text(b, x + 2, yBase + 12 + j * (cardHeight + cardSpacing) + 7);
     });
   });
 
-  // REST API
-  const xK1 = xBase;
-  const wK1 = widthBox;
-  const xK2 = xBase + (widthBox + xSpacing);
+  // REST API Balken
+  const barY = yBase + 12 + 10; // leicht unterhalb Kachel-Titel
+  const barHeight = kacheln[0].boxes.length * (cardHeight + cardSpacing) - 10;
+  const barX = marginLeft;
+  const barWidth = pageWidth - marginLeft - marginRight;
+  pdf.setFillColor(220, 220, 220); // dunkleres Grau
+  pdf.rect(barX, barY, barWidth, barHeight, "F");
 
-  const restX = xK1 + wK1 + ((xK2 - (xK1 + wK1)) / 2);
-  const restY = barY + 3;
-
+  // REST API Text vorne
   pdf.setFont("helvetica", "bold");
   pdf.setFontSize(8);
   pdf.setTextColor(...colors.textDark);
-  pdf.text("REST", restX, restY, { align: "center" });
-  pdf.text("API", restX, restY + 4, { align: "center" });
+  pdf.text("REST", restApiX, restApiY);
+  pdf.text("API", restApiX, restApiY + 8);
 
-  // --- Text unter Kacheln ---
-const bottomTextY =
-  y + maxHeight + 10; // Abstand unter Kacheln
+  // Text unter Kacheln
+  const unterText = "Ein besonderes Merkmal der DTP ist der hohe Sicherheitsstandard in der Betrugsprävention. So ermöglicht z. B. Device Fingerprinting eine frühzeitige Risikoerkennung anhand technischer Merkmale und schützt bereits vor Abschluss eines Prozesses vor potenziell betrügerischen Zugriffen. Gleichzeitig gewährleistet der Zugriff auf einen breit abgestützten Fraud Pool mit Millionen Transaktionen eine kontinuierliche Risikobewertung auf Basis vernetzter Erkenntnisse.\nDurch die Kombination aus modernster Technologie, regulatorischer Konformität und praxiserprobter Integration bietet die Digital Trust Platform eine zukunftssichere Grundlage für digitale Prozesse mit hoher Akzeptanz bei Endkundinnen und Endkunden – egal ob im Finanzbereich, E-Commerce, Mobilitätssektor oder in der öffentlichen Verwaltung.";
+  pdf.setFont("helvetica", "normal");
+  pdf.setFontSize(10);
+  const unterLines = pdf.splitTextToSize(unterText, maxTextWidth);
+  pdf.text(unterLines, marginLeft, yBase + kacheln[0].boxes.length * (cardHeight + cardSpacing) + 50);
 
-pdf.setFont("helvetica", "normal");
-pdf.setFontSize(10);
-pdf.setTextColor(...colors.textDark);
+  y += 12 + kacheln[0].boxes.length * (cardHeight + cardSpacing) + unterLines.length * 6;
 
-const bottomText =
-  "Ein besonderes Merkmal der DTP ist der hohe Sicherheitsstandard in der Betrugsprävention. So ermöglicht z. B. Device Fingerprinting eine frühzeitige Risikoerkennung anhand technischer Merkmale und schützt bereits vor Abschluss eines Prozesses vor potenziell betrügerischen Zugriffen. Gleichzeitig gewährleistet der Zugriff auf einen breit abgestützten Fraud Pool mit Millionen Transaktionen eine kontinuierliche Risikobewertung auf Basis vernetzter Erkenntnisse. " +
-  "Durch die Kombination aus modernster Technologie, regulatorischer Konformität und praxiserprobter Integration bietet die Digital Trust Platform eine zukunftssichere Grundlage für digitale Prozesse mit hoher Akzeptanz bei Endkundinnen und Endkunden – egal ob im Finanzbereich, E-Commerce, Mobilitätssektor oder in der öffentlichen Verwaltung.";
-
-const bottomLines = pdf.splitTextToSize(
-  bottomText,
-  maxTextWidth
-);
-
-pdf.text(bottomLines, marginLeft, bottomTextY);
 }
   // =========================
   // ENDE SEITE 4
