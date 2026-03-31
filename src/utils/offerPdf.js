@@ -200,12 +200,11 @@ function drawDTPPage() {
   pdf.text(textLines, marginLeft, y);
   y += textLines.length * 5 + 3;
 
-  // Bullet Titel
+  // Bulletpunkte
   pdf.setFont("helvetica", "bold");
   pdf.text("Kernmodule der DTP sind:", marginLeft, y);
   y += 5;
 
-  // Bulletpoints mit größerem Abstand nach ":"
   const bullets = [
     {
       title: "Identification",
@@ -227,17 +226,17 @@ function drawDTPPage() {
   bullets.forEach((b) => {
     pdf.setFont("helvetica", "bold");
     pdf.text("•", marginLeft, y);
-    pdf.text(`${b.title}:`, marginLeft + 4, y); // Bulletpoint Titel
+    pdf.text(`${b.title}:`, marginLeft + 4, y);
 
     pdf.setFont("helvetica", "normal");
-    const lines = pdf.splitTextToSize(b.text, maxTextWidth - 30); // <-- Abstand nach ":" vergrößert
-    pdf.text(lines, marginLeft + 30, y); // <-- Text startet weiter rechts
+    const lines = pdf.splitTextToSize(b.text, maxTextWidth - 30);
+    pdf.text(lines, marginLeft + 30, y);
     y += lines.length * 5 + 2;
   });
 
   y += 4;
 
-  // Kacheln
+  // Kacheln mit REST API Balken
   const kacheln = [
     { title: "Kunde", boxes: ["Self-Onboarding", "CRM", "Interne Applikation", "Externe Applikation"] },
     { title: "IDENTIFICATION", boxes: ["AutoIdent", "VideoIdent", "OnlineIdent", "QES-Ident (seal.ID)", "BankIdent (ab 2026)"] },
@@ -248,25 +247,37 @@ function drawDTPPage() {
   const boxWidth = 40;
   const gap = 5;
 
+  // REST API Balken hinter Kachel 1 & 2
+  const barX = marginLeft;
+  const barY = y + 8 + 0.5 * (Math.max(kacheln[0].boxes.length, kacheln[1].boxes.length) * 9);
+  const barWidth = boxWidth * 2 + gap; // zieht sich über 2 Kacheln
+  const barHeight = 8;
+
+  pdf.setFillColor(240, 240, 240); // hellgrau
+  pdf.rect(barX, barY, barWidth, barHeight, "F");
+
+  // REST API Text
+  pdf.setFont("helvetica", "bold");
+  pdf.setFontSize(9);
+  pdf.setTextColor(...colors.textDark);
+  pdf.text("REST API", barX + barWidth / 2, barY + 6, { align: "center" });
+
+  // Kacheln zeichnen
   kacheln.forEach((k, i) => {
     const x = marginLeft + i * (boxWidth + gap);
     const height = 10 + k.boxes.length * 9;
 
-    // Hintergrund
     pdf.setFillColor(...colors.grayBox);
     pdf.rect(x, y, boxWidth, height, "F");
 
-    // Titel
     pdf.setFont("helvetica", "bold");
     pdf.setFontSize(9);
     pdf.setTextColor(...colors.textDark);
     pdf.text(k.title, x + 2, y + 6);
 
-    // Cards
     pdf.setFontSize(8);
     k.boxes.forEach((b, j) => {
       const yy = y + 8 + j * 9;
-
       pdf.setFillColor(...colors.intrumPurple);
       pdf.rect(x + 1, yy, boxWidth - 2, 7, "F");
 
