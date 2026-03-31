@@ -6,7 +6,7 @@ export function exportOfferPDF(data) {
 
   const colors = {
     darkViolet: [23, 4, 86],
-    intrumViolet: [60, 20, 140],
+    intrumViolet: [60, 20, 140], // nur noch Intrum-Violett
     textDark: [0, 0, 0],
     textLight: [255, 255, 255],
     cardBg: [245, 245, 250],
@@ -73,7 +73,7 @@ export function exportOfferPDF(data) {
 
     let y = 55;
     pdf.setFont("helvetica", "normal");
-    pdf.setFontSize(11);
+    pdf.setFontSize(10); // Schriftgröße angepasst
     pdf.setTextColor(...colors.textDark);
     pdf.text("Ausgearbeitet von", 20, y);
 
@@ -103,7 +103,7 @@ export function exportOfferPDF(data) {
         ["PLZ / Ort", `${data.postcode || ""} ${data.city || ""}`],
       ],
       headStyles: { fillColor: colors.cardBg, textColor: colors.textDark, fontStyle: "bold" },
-      styles: { fontSize: 10.5, textColor: colors.textDark, lineColor: colors.border },
+      styles: { fontSize: 10, textColor: colors.textDark, lineColor: colors.border },
       margin: { left: 20, right: 20 },
     });
 
@@ -116,7 +116,7 @@ export function exportOfferPDF(data) {
         ["E-Mail", data.contactEmail || "—"],
       ],
       headStyles: { fillColor: colors.cardBg, textColor: colors.textDark, fontStyle: "bold" },
-      styles: { fontSize: 10.5, textColor: colors.textDark, lineColor: colors.border },
+      styles: { fontSize: 10, textColor: colors.textDark, lineColor: colors.border },
       margin: { left: 20, right: 20 },
     });
   }
@@ -128,7 +128,7 @@ export function exportOfferPDF(data) {
     drawHeaderFooter(3);
 
     pdf.setFont("helvetica", "bold");
-    pdf.setFontSize(16);
+    pdf.setFontSize(10); // Schriftgröße angepasst
     pdf.setTextColor(...colors.textDark);
     pdf.text("Inhalt", 20, 20);
 
@@ -147,7 +147,7 @@ export function exportOfferPDF(data) {
 
     toc.forEach((row) => {
       pdf.setFont("helvetica", "normal");
-      pdf.setFontSize(11);
+      pdf.setFontSize(10);
       pdf.text(row.title, 20, y);
 
       const textWidth = pdf.getTextWidth(row.title);
@@ -157,7 +157,7 @@ export function exportOfferPDF(data) {
       const dots = ".".repeat(dotCount);
       pdf.text(dots, startX, y);
       pdf.text(String(row.page), 190, y, { align: "right" });
-      y += 10;
+      y += 8; // Abstand leicht reduziert für Schriftgröße 10
     });
   }
 
@@ -174,23 +174,24 @@ export function exportOfferPDF(data) {
 
     let y = 20;
     pdf.setFont("helvetica", "bold");
-    pdf.setFontSize(14);
+    pdf.setFontSize(10); // Schriftgröße angepasst
     const title =
       "1\tDigital Trust Platform – Die Grundlage für sichere und effiziente digitale Geschäftsprozesse";
     const titleLines = pdf.splitTextToSize(title, maxTextWidth);
     pdf.setTextColor(...colors.textDark);
     pdf.text(titleLines, marginLeft, y);
-    y += titleLines.length * 7 + 5;
+    y += titleLines.length * 6 + 4;
 
     pdf.setFont("helvetica", "normal");
-    const paragraph = `Die Digital Trust Platform (DTP) verbindet alle zentralen Elemente für ein durchgängig digitales und vertrauenswürdiges Onboarding in einer modular aufgebauten Lösung: von der Identifikation über Bonitäts- und Fraud-Prüfungen bis hin zur elektronischen Signatur – sicher, rechtskonform und effizient. Die Plattform wurde speziell dafür entwickelt, Unternehmen bei der Digitalisierung kritischer Prozesse zu unterstützen, ohne dabei Kompromisse bei Sicherheit, Nutzerfreundlichkeit oder regulatorischer Konformität einzugehen. Sie lässt sich flexibel in bestehende Systemlandschaften integrieren und ermöglicht so individuelle Customer Journeys mit hohem Automatisierungsgrad.`;
+    const paragraph =
+      "Die Digital Trust Platform (DTP) verbindet alle zentralen Elemente für ein durchgängig digitales und vertrauenswürdiges Onboarding in einer modular aufgebauten Lösung: von der Identifikation über Bonitäts- und Fraud-Prüfungen bis hin zur elektronischen Signatur – sicher, rechtskonform und effizient. Die Plattform wurde speziell dafür entwickelt, Unternehmen bei der Digitalisierung kritischer Prozesse zu unterstützen, ohne dabei Kompromisse bei Sicherheit, Nutzerfreundlichkeit oder regulatorischer Konformität einzugehen. Sie lässt sich flexibel in bestehende Systemlandschaften integrieren und ermöglicht so individuelle Customer Journeys mit hohem Automatisierungsgrad.";
     const paraLines = pdf.splitTextToSize(paragraph, maxTextWidth);
     pdf.text(paraLines, marginLeft, y);
-    y += paraLines.length * 7 + 5;
+    y += paraLines.length * 6 + 4;
 
     pdf.setFont("helvetica", "bold");
     pdf.text("Kernmodule der DTP sind:", marginLeft, y);
-    y += 7;
+    y += 6;
 
     const bullets = [
       {
@@ -213,13 +214,13 @@ export function exportOfferPDF(data) {
       pdf.setFont("helvetica", "normal");
       const lines = pdf.splitTextToSize(b.text, maxTextWidth - 25);
       pdf.text(lines, marginLeft + 25, y);
-      y += lines.length * 7 + 3;
+      y += lines.length * 6 + 2;
     });
 
     y += 5;
 
     // ---------------------------
-    // KACHELN (vier Einheiten)
+    // KACHELN (vier Einheiten, optisch getrennt)
     // ---------------------------
     const kacheln = [
       { title: "Kunde", boxes: ["Self-Onboarding", "CRM", "Interne Applikation", "Externe Applikation"] },
@@ -229,7 +230,7 @@ export function exportOfferPDF(data) {
     ];
 
     const kWidth = 40;
-    const kSpacing = 6;
+    const kSpacing = 10; // Abstand zwischen Kacheln größer für optische Trennung
     const startX = marginLeft;
     let kY = y;
 
